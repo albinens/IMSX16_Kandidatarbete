@@ -84,6 +84,40 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
+  /remove-room/{room}:
+    delete:
+      summary: 'Removes a room from the tracking list.'
+      security:
+        - ApiKey: []
+      parameters:
+        - name: 'room'
+          in: 'path'
+          required: true
+          description: 'The name of the room.'
+          schema:
+            type: 'string'
+      responses:
+        '200':
+          description: 'The room was successfully removed.'
+        '404':
+          description: 'The specified room does not exist.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '500':
+          description: 'Internal Server Error.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '401':
+          description: 'Unauthorized.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+
   /report/status:
     post:
       summary: 'Report the amount of people in a room currently.'
