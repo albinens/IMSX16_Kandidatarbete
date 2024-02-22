@@ -1,0 +1,200 @@
+openapi: '3.0.2'
+info:
+  title: 'Chalmers Room Availability'
+  version: '1.0'
+  description: 'API to get the current (and past) availability of group rooms at Chalmers University of Technology.'
+
+paths:
+  /current:
+    get:
+      summary: 'Gets a list of all rooms and their current availability.'
+      responses:
+        '200':
+          description: 'A list of all rooms and their current availability.'
+          content:
+            application/json:
+              schema:
+                type: 'array'
+                items:
+                  $ref: '#/components/schemas/Room'
+        '500':
+          description: 'Internal Server Error.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /current/{room}:
+    get:
+      summary: 'Gets the current availability of a specific room.'
+      parameters:
+        - name: 'room'
+          in: 'path'
+          required: true
+          description: 'The name of the room.'
+          schema:
+            type: 'string'
+      responses:
+        '200':
+          description: 'The current availability of the specified room.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+        '404':
+          description: 'The specified room does not exist.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '500':
+          description: 'Internal Server Error.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /add-room:
+    post:
+      summary: 'Adds a new room for tracking status of.'
+      security:
+        - ApiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddRoom'
+      responses:
+        '200':
+          description: 'The room was successfully added.'
+        '500':
+          description: 'Internal Server Error.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '400':
+          description: 'Request not formatted correctly.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: 'Unauthorized.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+  /report/status:
+    post:
+      summary: 'Report the amount of people in a room currently.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: 'integer'
+              description: 'The amount of people in the room.'
+              example: 5
+      responses:
+        '200':
+          description: 'The status was successfully reported.'
+        '500':
+          description: 'Internal Server Error.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '401':
+          description: 'If the mac-address of the sensor is not registered.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '400':
+          description: 'Request not formatted correctly.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+
+components:
+  schemas:
+    # Error responses
+    InternalServerError:
+      type: 'object'
+      properties:
+        error:
+          type: 'string'
+          description: 'A human-readable error message.'
+          example: 'Internal Server Error.'
+        code:
+          type: 'integer'
+          description: 'A machine-readable error code.'
+          example: 500
+    NotFoundError:
+      type: 'object'
+      properties:
+        error:
+          type: 'string'
+          description: 'A human-readable error message.'
+          example: 'The specified room does not exist.'
+        code:
+          type: 'integer'
+          description: 'A machine-readable error code.'
+          example: 404
+    BadRequestError:
+      type: 'object'
+      properties:
+        error:
+          type: 'string'
+          description: 'A human-readable error message.'
+          example: 'Request not formatted correctly.'
+        code:
+          type: 'integer'
+          description: 'A machine-readable error code.'
+          example: 400
+    UnauthorizedError:
+      type: 'object'
+      properties:
+        error:
+          type: 'string'
+          description: 'A human-readable error message.'
+          example: 'You are not authorized to perform this action.'
+        code:
+          type: 'integer'
+          description: 'A machine-readable error code.'
+          example: 401
+
+    # Room data
+    Status:
+      type: 'string'
+      enum:
+        - 'available'
+        - 'occupied'
+        - 'booked'
+    Room:
+      type: 'object'
+      properties:
+        room:
+          type: 'string'
+          description: 'The name of the room.'
+          example: 'EG-2515'
+        available:
+          $ref: '#/components/schemas/Status'
+    AddRoom:
+      type: 'object'
+      properties:
+        name:
+          type: 'string'
+          description: 'The name of the room.'
+          example: 'EG-2515'
+        mac-address:
+          type: 'string'
+          description: 'The MAC address of the sensor in the room.'
+          example: '00:00:00:00:00:00'
+
+  securitySchemes:
+    ApiKey:
+      type: 'apiKey'
+      in: 'header'
+      name: 'X-API-KEY'
