@@ -1,10 +1,10 @@
-<mxfile host="app.diagrams.net" modified="2024-02-22T08:30:22.970Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36" etag="0YY7eAFzzQ6rVa-5crDZ" version="23.0.2" type="github">
+<mxfile host="app.diagrams.net" modified="2024-02-22T09:02:42.233Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36" etag="BJAADdumhUf6AF8UBz95" version="23.0.2" type="github">
   <diagram name="Sida-1" id="ydKVtQEPHB9de50PJjMJ">
-    <mxGraphModel dx="635" dy="363" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="756" dy="432" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="ZMfJjPU6kT4Z6zHWJhPS-2" value="SQL" style="shape=datastore;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="ZMfJjPU6kT4Z6zHWJhPS-2" value="SQL" style="shape=datastore;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
           <mxGeometry x="675" y="160" width="70" height="100" as="geometry" />
         </mxCell>
         <mxCell id="ZMfJjPU6kT4Z6zHWJhPS-3" value="Auth Service" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
@@ -19,7 +19,7 @@
         <mxCell id="ZMfJjPU6kT4Z6zHWJhPS-6" value="Sensor Service" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
           <mxGeometry x="400" y="250" width="110" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="ZMfJjPU6kT4Z6zHWJhPS-7" value="Time Series" style="shape=datastore;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="ZMfJjPU6kT4Z6zHWJhPS-7" value="Time Series" style="shape=datastore;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
           <mxGeometry x="675" y="300" width="70" height="100" as="geometry" />
         </mxCell>
         <mxCell id="ZMfJjPU6kT4Z6zHWJhPS-8" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=block;startFill=0;" edge="1" parent="1" source="ZMfJjPU6kT4Z6zHWJhPS-4" target="ZMfJjPU6kT4Z6zHWJhPS-3">
