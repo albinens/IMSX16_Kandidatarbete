@@ -1,4 +1,5 @@
 import React, {Children} from 'react';
+import './cardGrid.css';
 
 const CardGrid = ({ children }) => {
   
@@ -8,9 +9,12 @@ const CardGrid = ({ children }) => {
   })
 
   return (
+    <>
+    <h1 style={{textAlign:"center"}}>Rooms</h1>
     <div className="card-grid">
       {result}
     </div>
+    </>
   );
 };
 

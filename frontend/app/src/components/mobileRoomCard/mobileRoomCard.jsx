@@ -11,8 +11,15 @@ Props:
 function MobileRoomCard(props) {
   let green = "#8ED264";
   let yellow = "#F4EC32";
-  let red = "E5414B";
+  let red = "#E5414B";
   const [roomStatus, setRoomStatus] = useState(props.Avaiability);
+  const [roomStatusColor, setRoomStatusColor] = useState(
+    roomStatus === "Available"
+      ? green
+      : roomStatus === "Booked"
+      ? yellow
+      : red
+  );
 
   return (
     <div className="mobile-room-card-root">
@@ -21,13 +28,18 @@ function MobileRoomCard(props) {
         <p className="mobile-room-card-house">{props.RoomHouse}</p>
       </div>
       <div 
-        className="mobile-room-card-availability-circle"
         style={{
-          backgroundColor: roomStatus === "Available" ? green : 
-          roomStatus === "Booked" ? yellow : red
-        }} 
-      />
-      
+          width:"50%",
+          marginLeft:"25%",
+          marginTop:"10%",
+        }}>
+        <div 
+          className="mobile-room-card-availability-circle"
+          style={{
+            backgroundColor: roomStatusColor
+          }} 
+        />
+      </div>
     </div>
   );
 }

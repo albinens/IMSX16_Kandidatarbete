@@ -9,9 +9,10 @@ function App() {
   return (
     <>
       <CardGrid>
-        <MobileRoomCard RoomName="Room 1" RoomHouse="House 1" Avaiability="Available" />
-        <MobileRoomCard RoomName="Room 2" RoomHouse="House 2" Avaiability="Booked" />
-        <MobileRoomCard RoomName="Room 3" RoomHouse="House 3" Avaiability="Occupied" />
+        <MobileRoomCard RoomName="Vasa G-14" RoomHouse="Vasa" Avaiability="Available" />
+        <MobileRoomCard RoomName="EG3503" RoomHouse="EDIT" Avaiability="Booked" />
+        <MobileRoomCard RoomName="M1215A" RoomHouse="Maskinhuset" Avaiability="Occupied" />
+        <MobileRoomCard RoomName="M1215B" RoomHouse="Maskinhuset" Avaiability="Available" />
       </CardGrid>
     </>
   )
