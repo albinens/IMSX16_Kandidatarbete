@@ -1,20 +1,22 @@
-import { useState } from 'react'
+import React from 'react'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import './App.css'
+import ListRooms from './pages/listRooms'
+import SearchRooms from './pages/searchRooms'
+import Layout from './layout';
 
-import CardGrid from './components/cardGrid/cardGrid'
-import MobileRoomCard from './components/mobileRoomCard/mobileRoomCard'
+
 
 function App() {
-
-  return (
-    <>
-      <CardGrid>
-        <MobileRoomCard RoomName="Vasa G-14" RoomHouse="Vasa" Avaiability="Available" />
-        <MobileRoomCard RoomName="EG3503" RoomHouse="EDIT" Avaiability="Booked" />
-        <MobileRoomCard RoomName="M1215A" RoomHouse="Maskinhuset" Avaiability="Occupied" />
-        <MobileRoomCard RoomName="M1215B" RoomHouse="Maskinhuset" Avaiability="Available" />
-      </CardGrid>
-    </>
+  return(
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<ListRooms />}/>
+          <Route path="search" element={<SearchRooms />}/>
+        </Route>
+      </Routes>
+    </BrowserRouter>
   )
 }
 
