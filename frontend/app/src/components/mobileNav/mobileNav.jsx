@@ -1,13 +1,16 @@
 import React from 'react';
 import './mobileNav.css';
+import search from '../../assets/search.svg';
+import settings from '../../assets/settings.svg';
+import home from '../../assets/home.svg';
 
 const MobileNav = () => {
   return (
     <nav>
       <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/search">Search</a></li>
-        <li><a href="/settings">Settings</a></li>
+        <li><a href="/"><img src={home}/></a></li>
+        <li><a href="/search"><img src={search}/></a></li>
+        <li><a href="/settings"><img src={settings}/></a></li>
       </ul>
     </nav>
   );

@@ -1,0 +1,23 @@
+nav ul {
+  list-style: none;
+  margin: auto;
+  display: flex;
+  flex-direction: row;
+  bottom: 12px;
+  position: fixed;
+}
+
+nav ul li {
+  display: inline-block;
+  width: 64px;
+  padding: 4px;
+  margin: auto;
+  margin-right: 12px;
+  border-radius: 16px;
+  background-color: #C1CDCD;
+  justify-content: center;
+}
+
+nav ul li a {
+  margin-left:12px ;
+}

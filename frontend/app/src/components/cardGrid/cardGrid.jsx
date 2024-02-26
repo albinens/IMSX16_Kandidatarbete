@@ -10,7 +10,6 @@ const CardGrid = ({ children }) => {
 
   return (
     <>
-    <h1 style={{textAlign:"center"}}>Rooms</h1>
     <div className="card-grid">
       {result}
     </div>

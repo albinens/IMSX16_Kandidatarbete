@@ -7,7 +7,7 @@ import DesktopNav from './components/desktopNav/desktopNav'
 
 const Layout = () => {
 
-  let mobileWidth = 600;
+  let mobileWidth = 700;
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   useEffect(() => {

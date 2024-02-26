@@ -4,6 +4,7 @@ import './App.css'
 import ListRooms from './pages/listRooms'
 import SearchRooms from './pages/searchRooms'
 import Layout from './layout';
+import Settings from './pages/settings';
 
 
 
@@ -14,6 +15,7 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<ListRooms />}/>
           <Route path="search" element={<SearchRooms />}/>
+          <Route path="settings" element={<Settings />}/>
         </Route>
       </Routes>
     </BrowserRouter>
