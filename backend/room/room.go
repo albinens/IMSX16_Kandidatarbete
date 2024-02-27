@@ -25,13 +25,7 @@ type RoomDBObject struct {
 	Building string
 }
 
-type RoomTimeObject struct {
-	Room           string
-	Time           uint64
-	NumberOfPeople uint8
-}
-
-func GetStatusOfAllRooms() {
+func GetStatusOfAllRooms() []Room {
 	tsClient := database.TSClient()
 	db := database.GetDB()
 
@@ -41,11 +35,6 @@ func GetStatusOfAllRooms() {
 	err := db.Select(&rooms, "SELECT * FROM rooms")
 	if err != nil {
 		panic(err)
-	}
-
-	for _, room := range rooms {
-		println(room.Name)
-		println(room.Sensor)
 	}
 
 	// Get status of all rooms from influx
@@ -62,8 +51,27 @@ func GetStatusOfAllRooms() {
 		panic(err)
 	}
 
+	currentOccupation := make(map[string]int64)
+
 	for result.Next() {
-		println(result.Record().ValueByKey("room").(string))
-		println(result.Record().Value().(int64))
+		currentOccupation[result.Record().ValueByKey("room").(string)] = result.Record().Value().(int64)
 	}
+
+	convertedRooms := make([]Room, len(rooms)-1)
+
+	for _, room := range rooms {
+		var status Status
+		if currentOccupation[room.Name] == 0 {
+			status = Available
+		} else {
+			status = Occupied
+		}
+
+		convertedRooms = append(convertedRooms, Room{
+			Room:   room.Name,
+			Status: status,
+		})
+	}
+
+	return convertedRooms
 }

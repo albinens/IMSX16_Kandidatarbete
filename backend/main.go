@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"example.com/m/v2/database"
@@ -25,5 +26,13 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func currentHandler(w http.ResponseWriter, r *http.Request) {
+	rooms := room.GetStatusOfAllRooms()
+	data, err := json.Marshal(rooms)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(data)
 }
