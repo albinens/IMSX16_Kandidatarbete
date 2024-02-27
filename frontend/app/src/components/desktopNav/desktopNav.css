@@ -1,11 +1,14 @@
 .desktop-nav .desktop-nav-list {
   list-style: none;
-  margin: none;
+  height: 64px;
+  margin: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
   display: flex;
   flex-direction: row;
   background-color: #C1CDCD;
-  width: 100%;
-  height: 64px;
+  position: fixed;
 }
 
 .desktop-nav .desktop-nav-list li {

@@ -7,4 +7,9 @@
   width: 75%;
   margin: auto;
   justify-content: center;
+  background-color: #e5e5e5;
+  overflow-y: scroll;
+  max-height: 60vh;
+  scrollbar-width: thin;
+  scrollbar-color: #e5e5e5 #f5f5f5;
 }
