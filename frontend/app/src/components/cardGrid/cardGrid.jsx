@@ -11,6 +11,7 @@ const CardGrid = ({ children }) => {
   return (
     <>
     <div className="card-grid">
+      
       {result}
     </div>
     </>

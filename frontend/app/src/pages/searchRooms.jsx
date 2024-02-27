@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import CardGrid from '../components/cardGrid/cardGrid'
 import MobileRoomCard from '../components/mobileRoomCard/mobileRoomCard'
+import HorizontalLegend from '../components/legends/horizontalLegend/horizontalLegend'
 import './searchRooms.css'
 
 function SearchRooms() {
@@ -11,16 +12,25 @@ function SearchRooms() {
 
 
   const handleSearch = (e) => {
-    setSearchQuery(e.target.value)
-    console.log(searchQuery)
+      setSearchQuery(e.target.value)
+      console.log(searchQuery)
+      if(e.target.value === ''){
+        setSearchResults(fakeData) //Change to API data
+      }
   }
 
   const handleSearchButton = () => {
-    let filteredData = fakeData.filter((room) => {
+    let filteredData = fakeData.filter((room) => { //Change to API data
       return room.roomName.toLowerCase().includes(searchQuery.toLowerCase())
     })
     setSearchResults(filteredData)
     console.log(searchResults)
+  }
+
+  const handleEnterSearch = (e) => {
+    if (e.key === 'Enter') {
+      handleSearchButton()
+    }
   }
 
   const fakeData = [
@@ -59,8 +69,7 @@ function SearchRooms() {
   useEffect(() => {
     // fetch data from api
     // setApiData(data)
-    // filter search results
-    setSearchResults(fakeData)
+    setSearchResults(fakeData) //Change to API data
   }, [])
 
   return (
@@ -74,6 +83,7 @@ function SearchRooms() {
           type="text" 
           placeholder="Search for rooms" 
           onChange={(e) => handleSearch(e)}
+          onKeyDown={(e) => handleEnterSearch(e)}
         />
         <button 
           className='search-page-input-button'
@@ -82,13 +92,14 @@ function SearchRooms() {
             Search
         </button>
       </div>
+      <HorizontalLegend />
       <CardGrid search>
         {
           searchResults.map((room, index) => {
             return (
               <>
                 <MobileRoomCard 
-                  key={index} 
+                  key={room.roomName} 
                   RoomName={room.roomName} 
                   RoomHouse={room.house} 
                   Avaiability={room.avaiability} 

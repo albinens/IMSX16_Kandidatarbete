@@ -14,12 +14,22 @@ function MobileRoomCard(props) {
   let red = "#E5414B";
   const [roomStatus, setRoomStatus] = useState(props.Avaiability);
   const [roomStatusColor, setRoomStatusColor] = useState(
-    roomStatus === "Available"
+    props.Avaiability === "Available"
       ? green
-      : roomStatus === "Booked"
+      : props.Avaiability === "Booked"
       ? yellow
       : red
   );
+
+  useEffect(() => {
+    setRoomStatusColor(
+      roomStatus === "Available"
+        ? green
+        : roomStatus === "Booked"
+        ? yellow
+        : red
+    );
+  }, [roomStatus])
 
   return (
     <div className="mobile-room-card-root">

@@ -5,8 +5,7 @@ import ListRooms from './pages/listRooms'
 import SearchRooms from './pages/searchRooms'
 import Layout from './layout';
 import Settings from './pages/settings';
-
-
+import Sensors from './pages/sensors';
 
 function App() {
   return(
@@ -16,6 +15,7 @@ function App() {
           <Route index element={<ListRooms />}/>
           <Route path="search" element={<SearchRooms />}/>
           <Route path="settings" element={<Settings />}/>
+          <Route path='sensors' element={<Sensors />}/>
         </Route>
       </Routes>
     </BrowserRouter>
