@@ -7,9 +7,11 @@ import (
 	"example.com/m/v2/database"
 	"example.com/m/v2/room"
 	"example.com/m/v2/seeder"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	godotenv.Load()
 	database.InitSQL()
 	database.InitTS()
 	seeder.SeedDevelopmentData()
