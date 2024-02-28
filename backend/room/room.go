@@ -2,8 +2,11 @@ package room
 
 import (
 	"context"
+	"time"
 
 	"example.com/m/v2/database"
+	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
+	"github.com/influxdata/influxdb-client-go/v2/api/write"
 )
 
 type Status string
@@ -25,28 +28,22 @@ type RoomDBObject struct {
 	Building string
 }
 
-func GetStatusOfAllRooms() []Room {
-	tsClient := database.TSClient()
-	db := database.GetDB()
-
-	var rooms []RoomDBObject
-
-	// Get all rooms from sql
-	err := db.Select(&rooms, "SELECT * FROM rooms")
+func StatusOfAllRooms() []Room {
+	rooms, err := AllRooms()
 	if err != nil {
 		panic(err)
 	}
 
 	// Get status of all rooms from influx
-	queryClient := tsClient.QueryAPI("liveinfo")
+	reader := database.TSReader()
 	query := `
 		from(bucket: "liveinfo")
-		|> range(start: -1h)
+		|> range(start: -7d)
 		|> filter(fn: (r) => r._measurement == "status")
 		|> filter(fn: (r) => r._field == "number_of_people")
 		|> last()
 	`
-	result, err := queryClient.Query(context.Background(), query)
+	result, err := reader.Query(context.Background(), query)
 	if err != nil {
 		panic(err)
 	}
@@ -74,4 +71,23 @@ func GetStatusOfAllRooms() []Room {
 	}
 
 	return convertedRooms
+}
+
+func AllRooms() ([]RoomDBObject, error) {
+	db := database.GetDB()
+
+	var rooms []RoomDBObject
+	err := db.Select(&rooms, "SELECT * FROM rooms")
+	if err != nil {
+		return nil, err
+	}
+
+	return rooms, nil
+}
+
+func CreateDataPoint(room string, numberOfPeople int64, time time.Time) *write.Point {
+	p := influxdb2.NewPointWithMeasurement("status").AddTag("room", room).
+		AddField("number_of_people", numberOfPeople).
+		SetTime(time)
+	return p
 }

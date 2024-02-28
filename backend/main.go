@@ -6,16 +6,18 @@ import (
 
 	"example.com/m/v2/database"
 	"example.com/m/v2/room"
+	"example.com/m/v2/seeder"
 )
 
 func main() {
 	database.InitSQL()
 	database.InitTS()
+	seeder.SeedDevelopmentData()
 
 	http.HandleFunc("GET /", handler)
 	http.HandleFunc("GET /api/current", currentHandler)
 
-	room.GetStatusOfAllRooms()
+	room.StatusOfAllRooms()
 
 	http.ListenAndServe(":8080", nil)
 
@@ -26,7 +28,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func currentHandler(w http.ResponseWriter, r *http.Request) {
-	rooms := room.GetStatusOfAllRooms()
+	rooms := room.StatusOfAllRooms()
 	data, err := json.Marshal(rooms)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
