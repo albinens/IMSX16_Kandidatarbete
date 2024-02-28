@@ -57,7 +57,7 @@ func GetStatusOfAllRooms() []Room {
 		currentOccupation[result.Record().ValueByKey("room").(string)] = result.Record().Value().(int64)
 	}
 
-	convertedRooms := make([]Room, len(rooms)-1)
+	convertedRooms := make([]Room, 0, len(rooms))
 
 	for _, room := range rooms {
 		var status Status
