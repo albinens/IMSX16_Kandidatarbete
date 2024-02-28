@@ -18,8 +18,9 @@ const (
 )
 
 type Room struct {
-	Room   string `json:"room"`
-	Status Status `json:"status"`
+	Room     string `json:"room"`
+	Building string `json:"building"`
+	Status   Status `json:"status"`
 }
 
 type RoomDBObject struct {
@@ -34,27 +35,12 @@ func StatusOfAllRooms() []Room {
 		panic(err)
 	}
 
-	// Get status of all rooms from influx
-	reader := database.TSReader()
-	query := `
-		from(bucket: "liveinfo")
-		|> range(start: -7d)
-		|> filter(fn: (r) => r._measurement == "status")
-		|> filter(fn: (r) => r._field == "number_of_people")
-		|> last()
-	`
-	result, err := reader.Query(context.Background(), query)
+	currentOccupation, err := currentRoomOccupancy()
 	if err != nil {
 		panic(err)
 	}
 
-	currentOccupation := make(map[string]int64)
-
-	for result.Next() {
-		currentOccupation[result.Record().ValueByKey("room").(string)] = result.Record().Value().(int64)
-	}
-
-	convertedRooms := make([]Room, 0, len(rooms))
+	roomsWithOccupancy := make([]Room, 0, len(rooms))
 
 	for _, room := range rooms {
 		var status Status
@@ -64,13 +50,14 @@ func StatusOfAllRooms() []Room {
 			status = Occupied
 		}
 
-		convertedRooms = append(convertedRooms, Room{
-			Room:   room.Name,
-			Status: status,
+		roomsWithOccupancy = append(roomsWithOccupancy, Room{
+			Room:     room.Name,
+			Building: room.Building,
+			Status:   status,
 		})
 	}
 
-	return convertedRooms
+	return roomsWithOccupancy
 }
 
 func AllRooms() ([]RoomDBObject, error) {
@@ -90,4 +77,27 @@ func CreateDataPoint(room string, numberOfPeople int64, time time.Time) *write.P
 		AddField("number_of_people", numberOfPeople).
 		SetTime(time)
 	return p
+}
+
+func currentRoomOccupancy() (map[string]int64, error) {
+	reader := database.TSReader()
+	query := `
+		from(bucket: "liveinfo")
+		|> range(start: -31d)
+		|> filter(fn: (r) => r._measurement == "status")
+		|> filter(fn: (r) => r._field == "number_of_people")
+		|> last()
+	`
+	result, err := reader.Query(context.Background(), query)
+	if err != nil {
+		return nil, err
+	}
+
+	currentOccupation := make(map[string]int64)
+
+	for result.Next() {
+		currentOccupation[result.Record().ValueByKey("room").(string)] = result.Record().Value().(int64)
+	}
+
+	return currentOccupation, nil
 }
