@@ -19,8 +19,6 @@ func main() {
 	http.HandleFunc("GET /", handler)
 	http.HandleFunc("GET /api/current", currentHandler)
 
-	room.StatusOfAllRooms()
-
 	http.ListenAndServe(env.Port, nil)
 }
 
