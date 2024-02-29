@@ -6,6 +6,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
+var Port string
+
 var InfluxDB struct {
 	Token  string
 	Url    string
@@ -27,6 +29,7 @@ func Load() {
 
 	loadPostgres()
 	loadInfluxDB()
+	Port = ":" + withDefault("PORT", "8080")
 }
 
 func loadPostgres() {
