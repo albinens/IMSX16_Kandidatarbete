@@ -1,6 +1,9 @@
 package database
 
 import (
+	"fmt"
+
+	"example.com/m/v2/env"
 	"example.com/m/v2/utils"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -24,7 +27,17 @@ const devSchemaAdditions = `
 var db *sqlx.DB
 
 func InitSQL() {
-	dbConn, err := sqlx.Connect("postgres", "postgres://liveinfo:liveinfo@localhost:5432/liveinfo?sslmode=disable")
+	connectionString := fmt.Sprintf(
+		"postgres://%s:%s@%s:%s/%s?sslmode=%s",
+		env.Postgres.Username,
+		env.Postgres.Password,
+		env.Postgres.Host,
+		env.Postgres.Port,
+		env.Postgres.Database,
+		env.Postgres.SSLMode,
+	)
+
+	dbConn, err := sqlx.Connect("postgres", connectionString)
 	if err != nil {
 		panic(err)
 	}

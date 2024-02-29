@@ -1,8 +1,7 @@
 package database
 
 import (
-	"os"
-
+	"example.com/m/v2/env"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
@@ -11,15 +10,11 @@ import (
 var client influxdb2.Client
 
 func InitTS() {
-	if os.Getenv("INFLUXDB_TOKEN") == "" {
-		panic("INFLUXDB_TOKEN is not set")
-	}
-
-	client = influxdb2.NewClient("http://localhost:8086", os.Getenv("INFLUXDB_TOKEN"))
+	client = influxdb2.NewClient(env.InfluxDB.Url, env.InfluxDB.Token)
 }
 
 func WriteTimeSeriesData(p *write.Point) {
-	writeAPI := client.WriteAPI("liveinfo", "liveinfo")
+	writeAPI := client.WriteAPI(env.InfluxDB.Org, env.InfluxDB.Bucket)
 	writeAPI.WritePoint(p)
 }
 
