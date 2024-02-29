@@ -9,7 +9,7 @@ import (
 
 var client influxdb2.Client
 
-func InitTS() {
+func InitTimeSeries() {
 	client = influxdb2.NewClient(env.InfluxDB.Url, env.InfluxDB.Token)
 }
 
@@ -18,6 +18,6 @@ func WriteTimeSeriesData(p *write.Point) {
 	writeAPI.WritePoint(p)
 }
 
-func TSReader() api.QueryAPI {
+func TimeSeriesReader() api.QueryAPI {
 	return client.QueryAPI("liveinfo")
 }

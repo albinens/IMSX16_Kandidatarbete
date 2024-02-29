@@ -13,7 +13,7 @@ import (
 func main() {
 	env.Load()
 	database.InitSQL()
-	database.InitTS()
+	database.InitTimeSeries()
 	seeder.SeedDevelopmentData()
 
 	http.HandleFunc("GET /", handler)

@@ -80,7 +80,7 @@ func CreateDataPoint(room string, numberOfPeople int64, time time.Time) *write.P
 }
 
 func currentRoomOccupancy() (map[string]int64, error) {
-	reader := database.TSReader()
+	reader := database.TimeSeriesReader()
 	query := `
 		from(bucket: "liveinfo")
 		|> range(start: -31d)
