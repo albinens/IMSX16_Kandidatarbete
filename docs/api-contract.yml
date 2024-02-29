@@ -206,6 +206,7 @@ components:
         - 'available'
         - 'occupied'
         - 'booked'
+      description: 'The status of the room. Can be "available", "occupied" or "booked".'
     Room:
       type: 'object'
       properties:
@@ -213,6 +214,10 @@ components:
           type: 'string'
           description: 'The name of the room.'
           example: 'EG-2515'
+        building:
+          type: 'string'
+          description: 'The building the room is located in.'
+          example: 'NC'
         available:
           $ref: '#/components/schemas/Status'
     AddRoom:
@@ -222,6 +227,10 @@ components:
           type: 'string'
           description: 'The name of the room.'
           example: 'EG-2515'
+        building:
+          type: 'string'
+          description: 'The building the room is located in.'
+          example: 'NC'
         mac-address:
           type: 'string'
           description: 'The MAC address of the sensor in the room.'
