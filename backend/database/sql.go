@@ -26,7 +26,7 @@ const devSchemaAdditions = `
 
 var db *sqlx.DB
 
-func InitSQL() {
+func InitSQL() error {
 	connectionString := fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s?sslmode=%s",
 		env.Postgres.Username,
@@ -39,24 +39,26 @@ func InitSQL() {
 
 	dbConn, err := sqlx.Connect("postgres", connectionString)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	db = dbConn
 
-	pushSQLSchema()
+	return pushSQLSchema()
 }
 
 func GetDB() *sqlx.DB {
 	return db
 }
 
-func pushSQLSchema() {
+func pushSQLSchema() error {
 	_, err := db.Exec(schema)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	if !utils.IsProduction() {
 		db.Exec(devSchemaAdditions)
 	}
+
+	return nil
 }

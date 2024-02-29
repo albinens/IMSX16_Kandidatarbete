@@ -29,15 +29,15 @@ type RoomDBObject struct {
 	Building string
 }
 
-func StatusOfAllRooms() []Room {
+func StatusOfAllRooms() ([]Room, error) {
 	rooms, err := AllRooms()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	currentOccupation, err := currentRoomOccupancy()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	roomsWithOccupancy := make([]Room, 0, len(rooms))
@@ -57,7 +57,7 @@ func StatusOfAllRooms() []Room {
 		})
 	}
 
-	return roomsWithOccupancy
+	return roomsWithOccupancy, nil
 }
 
 func AllRooms() ([]RoomDBObject, error) {

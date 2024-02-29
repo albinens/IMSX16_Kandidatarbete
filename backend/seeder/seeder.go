@@ -12,63 +12,107 @@ import (
 	"example.com/m/v2/utils"
 )
 
-func SeedDevelopmentData() {
+func SeedDevelopmentData() error {
 	if utils.IsProduction() {
-		return
+		return nil
 	}
 
-	populateSQL()
-	populateRoomTimeSeriesData()
+	if err := populateSQL(); err != nil {
+		return err
+	}
+	if err := populateRoomTimeSeriesData(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func populateSQL() {
-	if hasPopulatedSQL() {
-		return
+func populateSQL() error {
+	alreadyPopulated, err := hasPopulatedSQL()
+	if err != nil {
+		return err
+	}
+
+	if alreadyPopulated {
+		return nil
 	}
 
 	db := database.GetDB()
 
 	tx, err := db.BeginTx(context.Background(), nil)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
-	_, err = tx.Exec("INSERT INTO rooms (name, sensor, building) VALUES ($1, $2, $3)", "EG-2515", "d7:6c:09:bb:f0:c4", "NC")
-	handleTXError(tx, err)
-	_, err = tx.Exec("INSERT INTO rooms (name, sensor, building) VALUES ($1, $2, $3)", "EG-2516", "65:1f:01:8a:26:b6", "NC")
-	handleTXError(tx, err)
-	_, err = tx.Exec("INSERT INTO rooms (name, sensor, building) VALUES ($1, $2, $3)", "M1203A", "c0:fc:7b:de:85:7d", "Maskinhuset")
-	handleTXError(tx, err)
-	_, err = tx.Exec("INSERT INTO rooms (name, sensor, building) VALUES ($1, $2, $3)", "Vasa-G14", "a9:af:39:d2:f1:cb", "Vasa")
-	handleTXError(tx, err)
+	if err := addRooms(tx); err != nil {
+		return err
+	}
 
-	err = tx.Commit()
+	if err = tx.Commit(); err != nil {
+		return err
+	}
+
+	flag, err := flag.Get("sql_test_rooms")
 	if err != nil {
-		panic(err)
+		return err
 	}
 
-	flag.GetFlag("sql_test_rooms").Set()
+	flag.Set()
+
+	return nil
 }
 
-func hasPopulatedSQL() bool {
-	return flag.GetFlag("sql_test_rooms").IsSet()
+func hasPopulatedSQL() (bool, error) {
+	flag, err := flag.Get("sql_test_rooms")
+	if err != nil {
+		return false, err
+	}
+
+	return flag.IsSet(), nil
 }
 
-func handleTXError(tx *sql.Tx, err error) {
+func addRooms(tx *sql.Tx) error {
+	if err := addRoom(tx, "EG-2515", "d7:6c:09:bb:f0:c4", "NC"); err != nil {
+		return err
+	}
+
+	if err := addRoom(tx, "EG-2516", "d7:6c:09:bb:f0:c4", "NC"); err != nil {
+		return err
+	}
+
+	if err := addRoom(tx, "M1203A", "c0:fc:7b:de:85:7d", "Maskinhuset"); err != nil {
+		return err
+	}
+
+	if err := addRoom(tx, "Vasa-G15", "a9:af:39:d2:f1:cb", "Vasa"); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func addRoom(tx *sql.Tx, name, sensor, building string) error {
+	_, err := tx.Exec("INSERT INTO rooms (name, sensor, building) VALUES ($1, $2, $3)", name, sensor, building)
 	if err != nil {
 		tx.Rollback()
-		panic(err)
+		return err
 	}
+	return nil
 }
 
-func populateRoomTimeSeriesData() {
-	if hasPopulatedTimeSeries() {
-		return
+func populateRoomTimeSeriesData() error {
+	alreadyPopulated, err := hasPopulatedTimeSeries()
+	if err != nil {
+		return err
+	}
+
+	if alreadyPopulated {
+		return nil
 	}
 
 	rooms, err := room.AllRooms()
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	for _, r := range rooms {
@@ -78,11 +122,22 @@ func populateRoomTimeSeriesData() {
 		}
 	}
 
-	flag.GetFlag("ts_test_rooms").Set()
+	flag, err := flag.Get("ts_test_rooms")
+	if err != nil {
+		return err
+	}
+
+	flag.Set()
+
+	return nil
 }
 
-func hasPopulatedTimeSeries() bool {
-	return flag.GetFlag("ts_test_rooms").IsSet()
+func hasPopulatedTimeSeries() (bool, error) {
+	flag, err := flag.Get("ts_test_rooms")
+	if err != nil {
+		return false, err
+	}
+	return flag.IsSet(), nil
 }
 
 func randPreviousTime() time.Time {

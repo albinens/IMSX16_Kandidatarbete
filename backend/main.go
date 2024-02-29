@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"example.com/m/v2/database"
@@ -12,9 +13,13 @@ import (
 
 func main() {
 	env.Load()
-	database.InitSQL()
+	if err := database.InitSQL(); err != nil {
+		fmt.Printf("Failed to initialize SQL: %s\n", err.Error())
+	}
 	database.InitTimeSeries()
-	seeder.SeedDevelopmentData()
+	if err := seeder.SeedDevelopmentData(); err != nil {
+		fmt.Printf("Failed to seed development data: %s\n", err.Error())
+	}
 
 	http.HandleFunc("GET /", handler)
 	http.HandleFunc("GET /api/current", currentHandler)
@@ -27,7 +32,12 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func currentHandler(w http.ResponseWriter, r *http.Request) {
-	rooms := room.StatusOfAllRooms()
+	rooms, err := room.StatusOfAllRooms()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	data, err := json.Marshal(rooms)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
