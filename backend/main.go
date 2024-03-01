@@ -40,15 +40,17 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func currentHandler(w http.ResponseWriter, r *http.Request) {
-	rooms, err := room.StatusOfAllRooms(r.Context())
+	rooms, err := room.StatusOfAllRooms()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		slog.ErrorContext(r.Context(), "Failed to determine room status", "error", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
 	data, err := json.Marshal(rooms)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		slog.ErrorContext(r.Context(), "Failed to convert room status to JSON", "error", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
