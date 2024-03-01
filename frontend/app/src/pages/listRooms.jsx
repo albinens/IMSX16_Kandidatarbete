@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import CardGrid from '../components/cardGrid/cardGrid'
-import MobileRoomCard from '../components/mobileRoomCard/mobileRoomCard'
+import RoomCard from '../components/roomCard/roomCard'
 import HorizontalLegend from '../components/legends/horizontalLegend/horizontalLegend'
 
 function ListRooms() {
 
   const [filteredQuery, setFilteredQuery] = useState([])
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
 
   const fakeData = [
     {
@@ -46,11 +47,17 @@ function ListRooms() {
     })
     setFilteredQuery(filteredData)
 
+    // Window resize event listener
+    function handleResize() {
+      setWindowWidth(window.innerWidth)
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
   },[])
 
   return (
     <>
-    <div className='page-header'>
+    <div className='page-header' style={windowWidth < 768 ? {marginTop:"3vh"} : {marginTop:"6vh"}}>
       <h1>Available Rooms</h1>
     </div>
     <HorizontalLegend />
@@ -59,7 +66,7 @@ function ListRooms() {
           filteredQuery.map((room, index) => {
             return (
               <>
-                <MobileRoomCard 
+                <RoomCard 
                   key={room.roomName} 
                   RoomName={room.roomName} 
                   RoomHouse={room.house} 

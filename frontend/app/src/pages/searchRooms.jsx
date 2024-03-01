@@ -1,8 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import CardGrid from '../components/cardGrid/cardGrid'
-import MobileRoomCard from '../components/mobileRoomCard/mobileRoomCard'
+import RoomCard from '../components/roomCard/roomCard'
 import HorizontalLegend from '../components/legends/horizontalLegend/horizontalLegend'
-import './searchRooms.css'
 
 function SearchRooms() {
 
@@ -98,7 +97,7 @@ function SearchRooms() {
           searchResults.map((room, index) => {
             return (
               <>
-                <MobileRoomCard 
+                <RoomCard 
                   key={room.roomName} 
                   RoomName={room.roomName} 
                   RoomHouse={room.house} 

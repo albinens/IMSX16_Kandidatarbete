@@ -14,11 +14,9 @@ const Layout = () => {
     const updateWindowDimensions = () => {
       const newWindowWidth = window.innerWidth;
       setWindowWidth(newWindowWidth);
-      console.log("updating width");
     };
 
     window.addEventListener("resize", updateWindowDimensions);
-
     return () => window.removeEventListener("resize", updateWindowDimensions) 
 
   }, []);

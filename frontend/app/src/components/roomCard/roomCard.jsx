@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import "./mobileRoomCard.css";
+import "./roomCard.css";
 
 /*
 Props: 
@@ -8,7 +8,7 @@ Props:
  - RoomHouse
  - Avaiability (Available, Booked, Occupied)
 */
-function MobileRoomCard(props) {
+function RoomCard(props) {
   let green = "#8ED264";
   let yellow = "#F4EC32";
   let red = "#E5414B";
@@ -54,4 +54,4 @@ function MobileRoomCard(props) {
   );
 }
 
-export default MobileRoomCard;
+export default RoomCard;
