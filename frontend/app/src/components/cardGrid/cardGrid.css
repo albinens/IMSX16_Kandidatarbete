@@ -1,0 +1,15 @@
+.card-grid{
+  display: flex;
+  flex-wrap: wrap;
+  padding: 8px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(255, 217, 217, 0.1);
+  width: 75%;
+  margin: auto;
+  justify-content: center;
+  background-color: #e5e5e5;
+  overflow-y: scroll;
+  height: 56vh;
+  scrollbar-width: thin;
+  scrollbar-color: #e5e5e5 #f5f5f5;
+}
