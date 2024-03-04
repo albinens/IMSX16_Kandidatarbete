@@ -102,3 +102,9 @@ func currentRoomOccupancy() (map[string]int64, error) {
 
 	return currentOccupation, nil
 }
+func AddRoom(name, sensor, building string) error {
+	db := database.GetDB()
+
+	_, err := db.Queryx("INSERT INTO rooms (name, sensor, building) VALUES ($1, $2, $3)", name, sensor, building)
+	return err
+}

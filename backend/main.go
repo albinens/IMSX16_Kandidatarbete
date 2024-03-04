@@ -28,6 +28,7 @@ func main() {
 
 	mux.HandleFunc("GET /", handler)
 	mux.HandleFunc("GET /api/current", currentHandler)
+	mux.HandleFunc("POST /api/add-room", addRoomHandler)
 
 	wrappedMux := logger.NewRequestLoggerMiddleware(mux)
 
@@ -56,4 +57,25 @@ func currentHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(data)
+}
+
+func addRoomHandler(w http.ResponseWriter, r *http.Request) {
+	var roomToAdd struct {
+		Name string `json:"name"`
+		Sensor string `json:"sensor"`
+		Building string `json:"building"`
+	} 
+	if err := json.NewDecoder(r.Body).Decode(&roomToAdd); err != nil {
+		slog.ErrorContext(r.Context(), "Failed to decode request body", "error", err)
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+
+	if err := room.AddRoom(roomToAdd.Name, roomToAdd.Sensor, roomToAdd.Building); err != nil {
+		slog.ErrorContext(r.Context(), "Failed to add room", "error", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
 }
