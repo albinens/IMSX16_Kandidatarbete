@@ -30,6 +30,7 @@ func main() {
 	mux.HandleFunc("GET /", handler)
 	mux.HandleFunc("GET /api/current", currentHandler)
 	mux.HandleFunc("POST /api/add-room", addRoomHandler)
+	mux.HandleFunc("DELETE /api/delete-room/{name}", deleteRoomHandler)
 
 	wrappedMux := logger.NewRequestLoggerMiddleware(mux)
 
@@ -85,4 +86,15 @@ func addRoomHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
+}
+func deleteRoomHandler(w http.ResponseWriter, r *http.Request) {
+	name := r.PathValue("name")
+
+	if err := room.DeleteRoom(name); err != nil {
+		slog.ErrorContext(r.Context(), "Failed to delete room", "error", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }

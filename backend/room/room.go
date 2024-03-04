@@ -108,3 +108,9 @@ func AddRoom(name, sensor, building string) error {
 	_, err := db.Queryx("INSERT INTO rooms (name, sensor, building) VALUES ($1, $2, $3)", name, sensor, building)
 	return err
 }
+func DeleteRoom(name string) error {
+	db := database.GetDB()
+
+	_, err := db.Queryx("DELETE FROM rooms WHERE name = $1", name)
+	return err
+}
