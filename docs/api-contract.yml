@@ -84,6 +84,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
+        '409':
+          description: 'The room already exists.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
   /remove-room/{room}:
     delete:
       summary: 'Removes a room from the tracking list.'
@@ -198,6 +204,17 @@ components:
           type: 'integer'
           description: 'A machine-readable error code.'
           example: 401
+    ConflictError:
+      type: 'object'
+      properties:
+        error:
+          type: 'string'
+          description: 'A human-readable error message.'
+          example: 'The room already exists.'
+        code:
+          type: 'integer'
+          description: 'A machine-readable error code.'
+          example: 409
 
     # Room data
     Status:

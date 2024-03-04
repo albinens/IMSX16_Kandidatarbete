@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
+	"strings"
 
 	"example.com/m/v2/database"
 	"example.com/m/v2/env"
@@ -61,10 +62,10 @@ func currentHandler(w http.ResponseWriter, r *http.Request) {
 
 func addRoomHandler(w http.ResponseWriter, r *http.Request) {
 	var roomToAdd struct {
-		Name string `json:"name"`
-		Sensor string `json:"sensor"`
+		Name     string `json:"name"`
+		Sensor   string `json:"sensor"`
 		Building string `json:"building"`
-	} 
+	}
 	if err := json.NewDecoder(r.Body).Decode(&roomToAdd); err != nil {
 		slog.ErrorContext(r.Context(), "Failed to decode request body", "error", err)
 		http.Error(w, "Bad request", http.StatusBadRequest)
@@ -72,6 +73,12 @@ func addRoomHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := room.AddRoom(roomToAdd.Name, roomToAdd.Sensor, roomToAdd.Building); err != nil {
+		if strings.HasPrefix(err.Error(), "pq: duplicate key value violates unique constraint") {
+			http.Error(w, "Room already exists", http.StatusConflict)
+			slog.DebugContext(r.Context(), "Room already exists", "room", roomToAdd.Name)
+			return
+		}
+
 		slog.ErrorContext(r.Context(), "Failed to add room", "error", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
