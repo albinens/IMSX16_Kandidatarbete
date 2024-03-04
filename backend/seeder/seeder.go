@@ -76,7 +76,7 @@ func addRooms(tx *sql.Tx) error {
 		return err
 	}
 
-	if err := addRoom(tx, "EG-2516", "d7:6c:09:bb:f0:c4", "NC"); err != nil {
+	if err := addRoom(tx, "EG-2516", "d7:6c:09:bb:ff:c4", "NC"); err != nil {
 		return err
 	}
 

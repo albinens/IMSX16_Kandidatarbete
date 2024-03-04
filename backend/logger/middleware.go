@@ -5,8 +5,6 @@ import (
 	"log/slog"
 	"net/http"
 	"time"
-
-	"golang.org/x/exp/slog"
 )
 
 type RequestLoggerMiddleware struct {

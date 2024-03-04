@@ -2,7 +2,6 @@ package room
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"example.com/m/v2/database"
