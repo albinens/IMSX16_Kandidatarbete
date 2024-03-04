@@ -27,8 +27,8 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /", handler)
 	mux.HandleFunc("GET /api/current", currentHandler)
+	mux.HandleFunc("GET /api/current/{room}", currentRoomHandler)
 	mux.HandleFunc("POST /api/add-room", addRoomHandler)
 	mux.HandleFunc("DELETE /api/delete-room/{name}", deleteRoomHandler)
 
@@ -36,10 +36,6 @@ func main() {
 
 	slog.Info("Starting server with", "port", env.Port)
 	utils.LogFatal("Server crashed with error: ", http.ListenAndServe(":"+env.Port, wrappedMux))
-}
-
-func handler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hello, World!"))
 }
 
 func currentHandler(w http.ResponseWriter, r *http.Request) {
@@ -87,6 +83,7 @@ func addRoomHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 }
+
 func deleteRoomHandler(w http.ResponseWriter, r *http.Request) {
 	name := r.PathValue("name")
 
@@ -97,4 +94,24 @@ func deleteRoomHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func currentRoomHandler(w http.ResponseWriter, r *http.Request) {
+	name := r.PathValue("room")
+	status, err := room.StatusOfRoom(name)
+	if err != nil {
+		slog.ErrorContext(r.Context(), "Failed to determine room status", "error", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	data, err := json.Marshal(status)
+	if err != nil {
+		slog.ErrorContext(r.Context(), "Failed to convert room status to JSON", "error", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(data)
 }

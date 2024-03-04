@@ -73,11 +73,59 @@ func AllRooms() ([]RoomDBObject, error) {
 	return rooms, nil
 }
 
+func RoomByName(name string) (RoomDBObject, error) {
+	db := database.GetDB()
+
+	var room RoomDBObject
+	err := db.Get(&room, "SELECT * FROM rooms WHERE name = $1", name)
+	if err != nil {
+		return RoomDBObject{}, errors.Wrap(err, "failed to query database for room by name")
+	}
+
+	return room, nil
+}
+
 func CreateDataPoint(room string, numberOfPeople int64, time time.Time) *write.Point {
 	p := influxdb2.NewPointWithMeasurement("status").AddTag("room", room).
 		AddField("number_of_people", numberOfPeople).
 		SetTime(time)
 	return p
+}
+
+
+func AddRoom(name, sensor, building string) error {
+	db := database.GetDB()
+
+	_, err := db.Queryx("INSERT INTO rooms (name, sensor, building) VALUES ($1, $2, $3)", name, sensor, building)
+	return err
+}
+
+func DeleteRoom(name string) error {
+	db := database.GetDB()
+
+	_, err := db.Queryx("DELETE FROM rooms WHERE name = $1", name)
+	return err
+}
+
+func StatusOfRoom(name string) (*Room, error) {
+	room, err := RoomByName(name)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get room by name")
+	}
+
+	occupancy, err := currentRoomOccupancy()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get current room occupancy")
+	}
+
+
+	status := occupationToStatus(occupancy[room.Name])
+
+	return &Room{
+		Room:     room.Name,
+		Building: room.Building,
+		Status:   status,
+	}, nil
 }
 
 func currentRoomOccupancy() (map[string]int64, error) {
@@ -102,15 +150,10 @@ func currentRoomOccupancy() (map[string]int64, error) {
 
 	return currentOccupation, nil
 }
-func AddRoom(name, sensor, building string) error {
-	db := database.GetDB()
 
-	_, err := db.Queryx("INSERT INTO rooms (name, sensor, building) VALUES ($1, $2, $3)", name, sensor, building)
-	return err
-}
-func DeleteRoom(name string) error {
-	db := database.GetDB()
-
-	_, err := db.Queryx("DELETE FROM rooms WHERE name = $1", name)
-	return err
+func occupationToStatus(occupation int64) Status {
+	if occupation == 0 {
+		return Available
+	}
+	return Occupied
 }
