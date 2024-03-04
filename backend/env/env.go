@@ -29,7 +29,7 @@ func Load() {
 
 	loadPostgres()
 	loadInfluxDB()
-	Port = ":" + withDefault("PORT", "8080")
+	Port = withDefault("PORT", "8080")
 }
 
 func loadPostgres() {

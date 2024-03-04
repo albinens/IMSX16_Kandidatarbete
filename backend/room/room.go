@@ -2,11 +2,13 @@ package room
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"example.com/m/v2/database"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
+	"github.com/pingcap/errors"
 )
 
 type Status string
@@ -32,12 +34,12 @@ type RoomDBObject struct {
 func StatusOfAllRooms() ([]Room, error) {
 	rooms, err := AllRooms()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to get all relevant rooms from the database")
 	}
 
 	currentOccupation, err := currentRoomOccupancy()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to get room occupancy data to determine room status")
 	}
 
 	roomsWithOccupancy := make([]Room, 0, len(rooms))
@@ -66,7 +68,7 @@ func AllRooms() ([]RoomDBObject, error) {
 	var rooms []RoomDBObject
 	err := db.Select(&rooms, "SELECT * FROM rooms")
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to query database for all rooms")
 	}
 
 	return rooms, nil
@@ -90,7 +92,7 @@ func currentRoomOccupancy() (map[string]int64, error) {
 	`
 	result, err := reader.Query(context.Background(), query)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to query influxdb for current room occupancy")
 	}
 
 	currentOccupation := make(map[string]int64)

@@ -2,29 +2,37 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
+	"log/slog"
 	"net/http"
 
 	"example.com/m/v2/database"
 	"example.com/m/v2/env"
+	"example.com/m/v2/logger"
 	"example.com/m/v2/room"
 	"example.com/m/v2/seeder"
+	"example.com/m/v2/utils"
 )
 
 func main() {
 	env.Load()
+	logger.Configure()
 	if err := database.InitSQL(); err != nil {
-		fmt.Printf("Failed to initialize SQL: %s\n", err.Error())
+		utils.LogFatal("Failed to initialize SQL: ", err)
 	}
 	database.InitTimeSeries()
 	if err := seeder.SeedDevelopmentData(); err != nil {
-		fmt.Printf("Failed to seed development data: %s\n", err.Error())
+		utils.LogFatal("Failed to seed development data: ", err)
 	}
 
-	http.HandleFunc("GET /", handler)
-	http.HandleFunc("GET /api/current", currentHandler)
+	mux := http.NewServeMux()
 
-	http.ListenAndServe(env.Port, nil)
+	mux.HandleFunc("GET /", handler)
+	mux.HandleFunc("GET /api/current", currentHandler)
+
+	wrappedMux := logger.NewRequestLoggerMiddleware(mux)
+
+	slog.Info("Starting server with", "port", env.Port)
+	utils.LogFatal("Server crashed with error: ", http.ListenAndServe(":"+env.Port, wrappedMux))
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -34,13 +42,15 @@ func handler(w http.ResponseWriter, r *http.Request) {
 func currentHandler(w http.ResponseWriter, r *http.Request) {
 	rooms, err := room.StatusOfAllRooms()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		slog.ErrorContext(r.Context(), "Failed to determine room status", "error", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
 	data, err := json.Marshal(rooms)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		slog.ErrorContext(r.Context(), "Failed to convert room status to JSON", "error", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
