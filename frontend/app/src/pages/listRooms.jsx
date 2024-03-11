@@ -2,11 +2,17 @@ import React, { useEffect, useState } from 'react'
 import CardGrid from '../components/cardGrid/cardGrid'
 import RoomCard from '../components/roomCard/roomCard'
 import HorizontalLegend from '../components/legends/horizontalLegend/horizontalLegend'
+import axios from 'axios'
 
 function ListRooms() {
 
+  const API_URL = import.meta.env.API_URL
+  const API_KEY = import.meta.env.API_KEY
+
   const [filteredQuery, setFilteredQuery] = useState([])
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+  
+  const [data, setData] = useState([])
 
   const fakeData = [
     {
@@ -42,6 +48,13 @@ function ListRooms() {
   ]
 
   useEffect(() => {
+
+    // Query the API, with axios
+    axios.get(`${API_URL}/rooms`).then((response) => {
+      setData(response.data)
+    })
+    console.log("DATA:" + data)
+
     let filteredData = fakeData.filter((room) => {
       return room.avaiability.toLowerCase().includes("available")
     })

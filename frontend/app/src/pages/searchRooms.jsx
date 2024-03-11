@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react'
 import CardGrid from '../components/cardGrid/cardGrid'
 import RoomCard from '../components/roomCard/roomCard'
 import HorizontalLegend from '../components/legends/horizontalLegend/horizontalLegend'
+import './styles/search.css'
 
 function SearchRooms() {
 

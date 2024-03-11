@@ -1,0 +1,51 @@
+
+.two-column-wrapper-sensors {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 6vh;
+}
+
+.left-column-sensors {
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.right-column-sensors {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.sensor-register-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  margin-top: 6vh;
+  background-color: #e5e5e5;
+  padding: 5rem;
+  border-radius: 10%;
+}
+
+.sensor-form-label-field {
+  width: 60%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e5e5e5;
+  margin-bottom: 20px;
+}
+
+.sensor-form-input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e5e5e5;
+  margin-bottom: 20px;
+}
