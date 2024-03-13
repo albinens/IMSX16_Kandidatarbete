@@ -27,7 +27,7 @@ The following environment variables are available:
 |    `POSTGRES_DB`     | The internal database used by the Postgres instance.                                                                                                 | liveinfo      | liveinfo                 |
 |   `POSTGRES_HOST`    | This is the host machine of the Postgres instance.                                                                                                   | localhost     | localhost                |
 | `POSTGRES_USERNAME`  | The username used to authenticate with the Postgres database. (required)                                                                             | none          | liveinfo                 |
-| `POSTGRES_PASSWORD`  | The passowrd used to authenticate with the Postgres database. (required)                                                                             | none          | SUPER_SECURE_PASSWORD123 |
+| `POSTGRES_PASSWORD`  | The password used to authenticate with the Postgres database. (required)                                                                             | none          | SUPER_SECURE_PASSWORD123 |
 |   `POSTGRES_PORT`    | The port used by the Postgres instance.                                                                                                              | 5432          | 5432                     |
 |  `POSTGRES_SSLMODE`  | Whether or not SSL should be used when connecting to the database. Available options [here](https://www.postgresql.org/docs/current/libpq-ssl.html). | disable       | prefer                   |
 |        `PORT`        | The port used by the server to listen for requests.                                                                                                  | 8080          | 3000                     |
@@ -39,3 +39,7 @@ The following environment variables are available:
 3. Start the databases using `docker-compose up -d`. This will start a PostgreSQL and a InfluxDB instance.
 4. Copy the `.env.example` file to `.env` and configure the environment variables. The default values are fine for local development.
 5. Run the backend using `go run .`. This will start the backend on port 8080.
+
+### API documentation
+
+If you want to see the API documentation, you can navigate to the `/api` path in your browser. This will show you a swagger documentation of the API.
