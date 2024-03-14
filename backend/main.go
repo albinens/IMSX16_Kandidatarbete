@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"example.com/m/v2/auth"
 	"example.com/m/v2/database"
 	"example.com/m/v2/env"
 	"example.com/m/v2/logger"
@@ -29,8 +30,9 @@ func main() {
 
 	mux.HandleFunc("GET /api/current", currentHandler)
 	mux.HandleFunc("GET /api/current/{room}", currentRoomHandler)
-	mux.HandleFunc("POST /api/add-room", addRoomHandler)
-	mux.HandleFunc("DELETE /api/delete-room/{name}", deleteRoomHandler)
+
+	mux.Handle("POST /api/add-room", auth.TokenAuthMiddleware(http.HandlerFunc(addRoomHandler)))
+	mux.Handle("DELETE /api/remove-room/{name}", auth.TokenAuthMiddleware(http.HandlerFunc(deleteRoomHandler)))
 
 	wrappedMux := logger.NewRequestLoggerMiddleware(mux)
 
