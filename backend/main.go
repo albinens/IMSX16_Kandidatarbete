@@ -31,8 +31,8 @@ func main() {
 	mux.HandleFunc("GET /api/current", currentHandler)
 	mux.HandleFunc("GET /api/current/{room}", currentRoomHandler)
 
-	mux.Handle("POST /api/add-room", auth.TokenAuthMiddleware(http.HandlerFunc(addRoomHandler)))
-	mux.Handle("DELETE /api/remove-room/{name}", auth.TokenAuthMiddleware(http.HandlerFunc(deleteRoomHandler)))
+	mux.Handle("POST /api/add-room", auth.TokenAuthMiddlewareFunc(addRoomHandler))
+	mux.Handle("DELETE /api/remove-room/{name}", auth.TokenAuthMiddlewareFunc(deleteRoomHandler))
 
 	wrappedMux := logger.NewRequestLoggerMiddleware(mux)
 
@@ -66,20 +66,20 @@ func addRoomHandler(w http.ResponseWriter, r *http.Request) {
 		Building string `json:"building"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&roomToAdd); err != nil {
+		utils.WriteHttpError(w, "Request body is malformed", http.StatusBadRequest)
 		slog.ErrorContext(r.Context(), "Failed to decode request body", "error", err)
-		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
 
 	if err := room.AddRoom(roomToAdd.Name, roomToAdd.Sensor, roomToAdd.Building); err != nil {
 		if strings.HasPrefix(err.Error(), "pq: duplicate key value violates unique constraint") {
-			http.Error(w, "Room already exists", http.StatusConflict)
+			utils.WriteHttpError(w, "Room already exists", http.StatusConflict)
 			slog.DebugContext(r.Context(), "Room already exists", "room", roomToAdd.Name)
 			return
 		}
 
+		utils.WriteHttpError(w, "Internal server error", http.StatusInternalServerError)
 		slog.ErrorContext(r.Context(), "Failed to add room", "error", err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
@@ -90,8 +90,8 @@ func deleteRoomHandler(w http.ResponseWriter, r *http.Request) {
 	name := r.PathValue("name")
 
 	if err := room.DeleteRoom(name); err != nil {
+		utils.WriteHttpError(w, "Internal server error", http.StatusInternalServerError)
 		slog.ErrorContext(r.Context(), "Failed to delete room", "error", err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
@@ -102,15 +102,15 @@ func currentRoomHandler(w http.ResponseWriter, r *http.Request) {
 	name := r.PathValue("room")
 	status, err := room.StatusOfRoom(name)
 	if err != nil {
+		utils.WriteHttpError(w, "Internal server error", http.StatusInternalServerError)
 		slog.ErrorContext(r.Context(), "Failed to determine room status", "error", err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
 	data, err := json.Marshal(status)
 	if err != nil {
+		utils.WriteHttpError(w, "Internal server error", http.StatusInternalServerError)
 		slog.ErrorContext(r.Context(), "Failed to convert room status to JSON", "error", err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
