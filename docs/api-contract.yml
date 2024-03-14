@@ -64,7 +64,7 @@ paths:
             schema:
               $ref: '#/components/schemas/AddRoom'
       responses:
-        '200':
+        '201':
           description: 'The room was successfully added.'
         '500':
           description: 'Internal Server Error.'
