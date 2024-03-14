@@ -15,6 +15,10 @@ CREATE TABLE IF NOT EXISTS rooms (
 	sensor TEXT UNIQUE NOT NULL,
 	building TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS api_keys (
+	key TEXT PRIMARY KEY
+);
 `
 
 const devSchemaAdditions = `

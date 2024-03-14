@@ -48,6 +48,10 @@ func populateSQL() error {
 		return err
 	}
 
+	if err := addApiKeys(tx); err != nil {
+		return err
+	}
+
 	if err = tx.Commit(); err != nil {
 		return err
 	}
@@ -93,6 +97,15 @@ func addRooms(tx *sql.Tx) error {
 
 func addRoom(tx *sql.Tx, name, sensor, building string) error {
 	_, err := tx.Exec("INSERT INTO rooms (name, sensor, building) VALUES ($1, $2, $3)", name, sensor, building)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	return nil
+}
+
+func addApiKeys(tx *sql.Tx) error {
+	_, err := tx.Exec("INSERT INTO api_keys (key) VALUES ('super_secret_key')")
 	if err != nil {
 		tx.Rollback()
 		return err
