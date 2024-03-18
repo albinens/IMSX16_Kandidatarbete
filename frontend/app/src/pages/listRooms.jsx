@@ -9,58 +9,28 @@ function ListRooms() {
   const API_URL = import.meta.env.API_URL
   const API_KEY = import.meta.env.API_KEY
 
-  const [filteredQuery, setFilteredQuery] = useState([])
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   
   const [data, setData] = useState([])
 
-  const fakeData = [
-    {
-      roomName: 'Vasa G-14',
-      house: 'Vasa',
-      avaiability: 'Available'
-    },
-    {
-      roomName: 'EG3503',
-      house: 'EDIT',
-      avaiability: 'Booked'
-    },
-    {
-      roomName: 'F4058',
-      house: 'Fysikhuset',
-      avaiability: 'Occupied'
-    },
-    {
-      roomName: 'M1215B',
-      house: 'Maskinhuset',
-      avaiability: 'Available'
-    },
-    {
-      roomName: 'SB-G303',
-      house: 'SB-huset',
-      avaiability: 'Available'
-    },
-    {
-      roomName: 'M1214E',
-      house: 'Maskinhuset',
-      avaiability: 'Occupied'
-    }
-  ]
+  const client = axios.create({
+    baseURL: "http://localhost:8080/api",
+  })
 
   useEffect(() => {
-
     // Query the API, with axios
-    axios.get(`${API_URL}/rooms`).then((response) => {
-      setData(response.data)
+    const fetchData = async () => {
+      client.get('/current').then((response) => { 
+        setData(response.data);
+      });
+    }
+    fetchData()
+    data.forEach(obj => {
+      console.log(obj)
     })
-    console.log("DATA:" + data)
+  },[])
 
-    let filteredData = fakeData.filter((room) => {
-      return room.avaiability.toLowerCase().includes("available")
-    })
-    setFilteredQuery(filteredData)
-
-    // Window resize event listener
+  useEffect(() => {
     function handleResize() {
       setWindowWidth(window.innerWidth)
     }
@@ -76,17 +46,19 @@ function ListRooms() {
     <HorizontalLegend />
       <CardGrid>
         {
-          filteredQuery.map((room, index) => {
-            return (
-              <>
-                <RoomCard 
-                  key={room.roomName} 
-                  RoomName={room.roomName} 
-                  RoomHouse={room.house} 
-                  Avaiability={room.avaiability} 
+          data.map((room, index) => {
+            if (room.status === "available") {
+              return (
+                <RoomCard
+                  key={room.room}
+                  RoomName={room.room}
+                  RoomHouse={room.building}
+                  Avaiability={room.status}
                 />
-              </>
-            )
+              );
+            } else {
+              return null; // Return null for non-available rooms (optional)
+            }
           })
         }
       </CardGrid>

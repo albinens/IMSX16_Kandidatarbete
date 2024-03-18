@@ -14,18 +14,18 @@ function RoomCard(props) {
   let red = "#E5414B";
   const [roomStatus, setRoomStatus] = useState(props.Avaiability);
   const [roomStatusColor, setRoomStatusColor] = useState(
-    props.Avaiability === "Available"
+    props.Avaiability === "available"
       ? green
-      : props.Avaiability === "Booked"
+      : props.Avaiability === "booked"
       ? yellow
       : red
   );
 
   useEffect(() => {
     setRoomStatusColor(
-      roomStatus === "Available"
+      roomStatus === "available"
         ? green
-        : roomStatus === "Booked"
+        : roomStatus === "booked"
         ? yellow
         : red
     );
