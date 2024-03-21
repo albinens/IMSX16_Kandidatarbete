@@ -244,6 +244,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
+        '404':
+          description: 'No data found for the given time range.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
 
 components:
   schemas:
