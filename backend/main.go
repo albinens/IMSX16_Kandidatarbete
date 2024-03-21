@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "embed"
 	"encoding/json"
 	"log/slog"
 	"net/http"
@@ -28,6 +29,9 @@ func main() {
 
 	mux := http.NewServeMux()
 
+	apiDocs := http.StripPrefix("/api", http.FileServer(http.Dir("../docs")))
+	mux.Handle("GET /api/", apiDocs)
+
 	mux.HandleFunc("GET /api/current", currentHandler)
 	mux.HandleFunc("GET /api/current/{room}", currentRoomHandler)
 
@@ -36,7 +40,7 @@ func main() {
 
 	wrappedMux := logger.NewRequestLoggerMiddleware(mux)
 
-	slog.Info("Starting server with", "port", env.Port)
+	slog.Info("Starting server", "port", env.Port)
 	utils.LogFatal("Server crashed with error: ", http.ListenAndServe(":"+env.Port, wrappedMux))
 }
 

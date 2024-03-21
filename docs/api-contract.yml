@@ -4,6 +4,10 @@ info:
   version: '1.0'
   description: 'API to get the current (and past) availability of group rooms at Chalmers University of Technology.'
 
+servers:
+  - url: '/api'
+    description: 'The base path for all API requests.'
+
 paths:
   /current:
     get:
