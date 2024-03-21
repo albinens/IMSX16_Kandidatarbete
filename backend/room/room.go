@@ -2,6 +2,7 @@ package room
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"example.com/m/v2/database"
@@ -92,7 +93,6 @@ func CreateDataPoint(room string, numberOfPeople int64, time time.Time) *write.P
 	return p
 }
 
-
 func AddRoom(name, sensor, building string) error {
 	db := database.GetDB()
 
@@ -118,7 +118,6 @@ func StatusOfRoom(name string) (*Room, error) {
 		return nil, errors.Wrap(err, "failed to get current room occupancy")
 	}
 
-
 	status := occupationToStatus(occupancy[room.Name])
 
 	return &Room{
@@ -126,6 +125,79 @@ func StatusOfRoom(name string) (*Room, error) {
 		Building: room.Building,
 		Status:   status,
 	}, nil
+}
+
+type WeekdayAverageRoomOccupancy map[string]map[string]float32
+type roomOccupancyWithEntries struct {
+	Occupancy float64
+	Entries   int
+}
+
+func RoomOccupancyPerDayOfWeek(from time.Time, to time.Time) (WeekdayAverageRoomOccupancy, error) {
+	if from.After(to) {
+		return nil, errors.New("from date must be before to date")
+	}
+
+	reader := database.TimeSeriesReader()
+	query := fmt.Sprintf(`
+		from(bucket: "liveinfo")
+		|> range(start: %d, stop: %d)
+		|> filter(fn: (r) => r._measurement == "status")
+		|> filter(fn: (r) => r._field == "number_of_people")
+		|> aggregateWindow(every: 1d, fn: mean)
+		|> group(columns: ["room", "_time"])
+	`, from.Unix(), to.Unix())
+
+	result, err := reader.Query(context.Background(), query)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to query influxdb for room occupancy per day of week")
+	}
+
+	data := make(map[string]map[string]roomOccupancyWithEntries, 0)
+
+	for result.Next() {
+		room := result.Record().ValueByKey("room").(string)
+		day := result.Record().Time().Weekday().String()
+
+		var occupancy float64
+		if result.Record().Value() == nil {
+			continue
+		}
+		occupancy = result.Record().Value().(float64)
+
+		if _, ok := data[room]; !ok {
+			addAllWeekDays(data, room)
+		}
+
+		data[room][day] = roomOccupancyWithEntries{
+			Occupancy: (data[room][day].Occupancy + occupancy) / float64(data[room][day].Entries+1),
+			Entries:   data[room][day].Entries + 1,
+		}
+	}
+
+	return toWeekdayAverage(data), nil
+}
+
+func addAllWeekDays(data map[string]map[string]roomOccupancyWithEntries, room string) {
+	data[room] = make(map[string]roomOccupancyWithEntries)
+
+	for i := 0; i < 7; i++ {
+		data[room][time.Weekday(i).String()] = roomOccupancyWithEntries{
+			Occupancy: 0,
+			Entries:   0,
+		}
+	}
+}
+
+func toWeekdayAverage(data map[string]map[string]roomOccupancyWithEntries) WeekdayAverageRoomOccupancy {
+	averages := make(WeekdayAverageRoomOccupancy)
+	for room, days := range data {
+		averages[room] = make(map[string]float32)
+		for day, entry := range days {
+			averages[room][day] = float32(entry.Occupancy)
+		}
+	}
+	return averages
 }
 
 func currentRoomOccupancy() (map[string]int64, error) {
