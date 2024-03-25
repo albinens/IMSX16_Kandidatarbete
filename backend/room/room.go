@@ -3,6 +3,7 @@ package room
 import (
 	"context"
 	"fmt"
+	"math"
 	"time"
 
 	"example.com/m/v2/database"
@@ -202,8 +203,8 @@ func toWeekdayAverage(data map[string]map[string]*roomOccupancyWithEntries) *Wee
 	for room, days := range data {
 		total[room] = make(map[string]float32)
 		for day, entry := range days {
-			average := float32(entry.Occupancy) / float32(entry.Entries)
-			twoDecimals := float32(int(average*100)) / 100
+			average := float64(entry.Occupancy) / float64(entry.Entries)
+			twoDecimals := float32(math.Round(average*100)) / 100
 			total[room][day] = twoDecimals
 		}
 	}
