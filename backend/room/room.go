@@ -75,16 +75,16 @@ func AllRooms() ([]RoomDBObject, error) {
 	return rooms, nil
 }
 
-func RoomByName(name string) (RoomDBObject, error) {
+func RoomByName(name string) (*RoomDBObject, error) {
 	db := database.GetDB()
 
 	var room RoomDBObject
 	err := db.Get(&room, "SELECT * FROM rooms WHERE name = $1", name)
 	if err != nil {
-		return RoomDBObject{}, errors.Wrap(err, "failed to query database for room by name")
+		return &RoomDBObject{}, errors.Wrap(err, "failed to query database for room by name")
 	}
 
-	return room, nil
+	return &room, nil
 }
 
 func CreateDataPoint(room string, numberOfPeople int64, time time.Time) *write.Point {
