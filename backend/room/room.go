@@ -3,11 +3,11 @@ package room
 import (
 	"context"
 	"fmt"
-	"math"
 	"time"
 
 	"example.com/m/v2/database"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
+	"github.com/influxdata/influxdb-client-go/v2/api"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
 	"github.com/pingcap/errors"
 )
@@ -130,11 +130,42 @@ func StatusOfRoom(name string) (*Room, error) {
 
 type WeekdayAverageRoomOccupancy map[string]map[string]float32
 type roomOccupancyWithEntries struct {
-	Occupancy float64
+	Occupancy int64
 	Entries   int
 }
 
-func RoomOccupancyPerDayOfWeek(from time.Time, to time.Time) (WeekdayAverageRoomOccupancy, error) {
+func RoomOccupancyPerDayOfWeek(from, to time.Time) (WeekdayAverageRoomOccupancy, error) {
+	result, err := dataBetween(from, to)
+	if err != nil {
+		return nil, err
+	}
+
+	data := make(map[string]map[string]roomOccupancyWithEntries, 0)
+
+	for result.Next() {
+		room := result.Record().ValueByKey("room").(string)
+		day := result.Record().Time().Weekday().String()
+
+		var occupancy int64
+		if result.Record().Value() == nil {
+			continue
+		}
+		occupancy = result.Record().Value().(int64)
+
+		if _, ok := data[room]; !ok {
+			addAllWeekDays(data, room)
+		}
+
+		data[room][day] = roomOccupancyWithEntries{
+			Occupancy: data[room][day].Occupancy + occupancy,
+			Entries:   data[room][day].Entries + 1,
+		}
+	}
+
+	return toWeekdayAverage(data), nil
+}
+
+func dataBetween(from, to time.Time) (*api.QueryTableResult, error) {
 	if from.After(to) {
 		return nil, errors.New("from date must be before to date")
 	}
@@ -144,8 +175,7 @@ func RoomOccupancyPerDayOfWeek(from time.Time, to time.Time) (WeekdayAverageRoom
 		from(bucket: "liveinfo")
 		|> range(start: %d, stop: %d)
 		|> filter(fn: (r) => r._measurement == "status")
-		|> filter(fn: (r) => r._field == "number_of_people")
-		|> aggregateWindow(every: 1d, fn: mean)
+		|> filter(fn: (r) => r._field == "number_of_people") 
 		|> group(columns: ["room", "_time"])
 	`, from.Unix(), to.Unix())
 
@@ -154,29 +184,7 @@ func RoomOccupancyPerDayOfWeek(from time.Time, to time.Time) (WeekdayAverageRoom
 		return nil, errors.Wrap(err, "failed to query influxdb for room occupancy per day of week")
 	}
 
-	data := make(map[string]map[string]roomOccupancyWithEntries, 0)
-
-	for result.Next() {
-		room := result.Record().ValueByKey("room").(string)
-		day := result.Record().Time().Weekday().String()
-
-		var occupancy float64
-		if result.Record().Value() == nil {
-			continue
-		}
-		occupancy = result.Record().Value().(float64)
-
-		if _, ok := data[room]; !ok {
-			addAllWeekDays(data, room)
-		}
-
-		data[room][day] = roomOccupancyWithEntries{
-			Occupancy: (data[room][day].Occupancy + occupancy) / float64(data[room][day].Entries+1),
-			Entries:   data[room][day].Entries + 1,
-		}
-	}
-
-	return toWeekdayAverage(data), nil
+	return result, nil
 }
 
 func addAllWeekDays(data map[string]map[string]roomOccupancyWithEntries, room string) {
@@ -191,15 +199,17 @@ func addAllWeekDays(data map[string]map[string]roomOccupancyWithEntries, room st
 }
 
 func toWeekdayAverage(data map[string]map[string]roomOccupancyWithEntries) WeekdayAverageRoomOccupancy {
-	averages := make(WeekdayAverageRoomOccupancy)
+	total := make(WeekdayAverageRoomOccupancy)
 	for room, days := range data {
-		averages[room] = make(map[string]float32)
+		total[room] = make(map[string]float32)
 		for day, entry := range days {
-			averages[room][day] = float32(math.Round(entry.Occupancy*100) / 100)
+			average := float32(entry.Occupancy) / float32(entry.Entries)
+			twoDecimals := float32(int(average*100)) / 100
+			total[room][day] = twoDecimals
 		}
 	}
 
-	return averages
+	return total
 }
 
 func currentRoomOccupancy() (map[string]int64, error) {
