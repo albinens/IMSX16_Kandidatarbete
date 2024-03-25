@@ -161,6 +161,96 @@ paths:
               schema:
                 $ref: '#/components/schemas/BadRequestError'
 
+  /stats/daily-average/{from}/{to}:
+    get:
+      summary: 'Get the weekday average occupancy for rooms between two timestamps.'
+      parameters:
+        - name: 'from'
+          in: 'path'
+          required: true
+          description: 'The start timestamp.'
+          schema:
+            type: 'integer'
+            format: 'int64'
+            example: 1614556800000
+        - name: 'to'
+          in: 'path'
+          required: true
+          description: 'The end timestamp.'
+          schema:
+            type: 'integer'
+            format: 'int64'
+            example: 1614643200000
+      responses:
+        '200':
+          description: 'The weekday average occupancy for rooms between the two timestamps.'
+          content:
+            application/json:
+              schema:
+                type: 'array'
+                items:
+                  type: 'object'
+                  properties:
+                    roomName:
+                      type: string
+                      description: 'The name of the room.'
+                      example: 'EG-2515'
+                    weekdayAverages:
+                      type: 'object'
+                      properties:
+                        monday:
+                          type: 'number'
+                          description: 'The average occupancy on Mondays.'
+                          example: 3
+                        tuesday:
+                          type: 'number'
+                          description: 'The average occupancy on Tuesdays.'
+                          example: 2.34
+                        wednesday:
+                          type: 'number'
+                          description: 'The average occupancy on Wednesdays.'
+                          example: 2.83
+                        thursday:
+                          type: 'number'
+                          description: 'The average occupancy on Thursdays.'
+                          example: 4
+                        friday:
+                          type: 'number'
+                          description: 'The average occupancy on Fridays.'
+                          example: 5
+                        saturday:
+                          type: 'number'
+                          description: 'The average occupancy on Saturdays.'
+                          example: 3.2
+                        sunday:
+                          type: 'number'
+                          description: 'The average occupancy on Sundays.'
+                          example: 0.5
+        '500':
+          description: 'Internal Server Error.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '400':
+          description: 'The timestamps are not a valid range.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: 'Unauthorized.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '404':
+          description: 'No data found for the given time range.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
 components:
   schemas:
     # Error responses
