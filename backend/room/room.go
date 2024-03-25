@@ -134,13 +134,11 @@ type roomOccupancyWithEntries struct {
 	Entries   int
 }
 
-func RoomOccupancyPerDayOfWeek(from, to time.Time) (WeekdayAverageRoomOccupancy, error) {
+func RoomOccupancyPerDayOfWeek(from, to time.Time) (*WeekdayAverageRoomOccupancy, error) {
 	result, err := dataBetween(from, to)
 	if err != nil {
 		return nil, err
 	}
-
-	start := time.Now()
 
 	data := make(map[string]map[string]*roomOccupancyWithEntries, 0)
 
@@ -163,12 +161,7 @@ func RoomOccupancyPerDayOfWeek(from, to time.Time) (WeekdayAverageRoomOccupancy,
 		roomDayData.Entries++
 	}
 
-	average := toWeekdayAverage(data)
-
-	time_since := time.Since(start)
-	fmt.Println("Time to calculate room occupancy per day of week: ", time_since)
-
-	return average, nil
+	return toWeekdayAverage(data), nil
 }
 
 func dataBetween(from, to time.Time) (*api.QueryTableResult, error) {
@@ -204,7 +197,7 @@ func addAllWeekDays(data map[string]map[string]*roomOccupancyWithEntries, room s
 	}
 }
 
-func toWeekdayAverage(data map[string]map[string]*roomOccupancyWithEntries) WeekdayAverageRoomOccupancy {
+func toWeekdayAverage(data map[string]map[string]*roomOccupancyWithEntries) *WeekdayAverageRoomOccupancy {
 	total := make(WeekdayAverageRoomOccupancy)
 	for room, days := range data {
 		total[room] = make(map[string]float32)
@@ -215,7 +208,7 @@ func toWeekdayAverage(data map[string]map[string]*roomOccupancyWithEntries) Week
 		}
 	}
 
-	return total
+	return &total
 }
 
 func currentRoomOccupancy() (map[string]int64, error) {
