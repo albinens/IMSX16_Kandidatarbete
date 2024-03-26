@@ -1,4 +1,6 @@
 import React, {useEffect, useState} from 'react'
+import CardGrid from '../components/cardGrid/cardGrid'
+import SensorCard from '../components/sensorCard/sensorCard'
 import './styles/sensors.css'
 
 function Sensors() {
@@ -55,16 +57,20 @@ function Sensors() {
       <div className='two-column-wrapper-sensors'>
         <div className='left-column-sensors'>
           <h1>List of Sensors</h1>
-          {sensorData.forEach((sensor, index) => {
-            return(
-              <div className='sensor-card' key={index}>
-                <h2>Sensor Name: {sensor.sensorName}</h2>
-                <h3>Sensor Room: {sensor.sensorRoom}</h3>
-                <h3>Sensor Registered Date: {sensor.sensorRegisteredDate}</h3>
-                <h3>Sensor Last Updated: {sensor.sensorLastUpdated}</h3>
-              </div>
-            )
-          }, [])}
+        <CardGrid>
+          {
+            fakeSensorData.map((sensor) => {
+              return (
+                <SensorCard
+                  key={sensor.sensorName}
+                  RoomName={sensor.sensorName}
+                  RoomHouse={sensor.sensorRoom}
+                  Avaiability={"Online"}
+                />
+              )
+            })
+          }
+        </CardGrid>
         </div>
         <div className='right-column-sensors'>
         <h1>Register Sensor</h1>
