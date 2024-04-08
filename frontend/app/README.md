@@ -24,3 +24,7 @@ The routing uses ```react-router-dom``` and is used since it's included with the
 1. Create a page (```.jsx``` file) in ```./app/src/pages```and export a ```React.JSX.Element``` object from this file.
 2. Import this object into the ```./app/src/App.jsx``` file.
 3. In the ```App.jsx``` file you can already see that there are a few routes and to add another one you add another ```<Route />``` attribute with the desired path and element. The element is the same object that you imported in step 2.
+
+
+## CORS problem in Chrome?
+Try running chrome with the following command on mac: ````open -n -a /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --args --user-data-dir="/tmp/chrome_dev_test" --disable-web-security```

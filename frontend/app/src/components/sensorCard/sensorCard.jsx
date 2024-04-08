@@ -6,24 +6,24 @@ import "./sensorCard.css";
 Props: 
  - RoomName
  - RoomHouse
- - Avaiability (Available, Booked, Occupied)
+ - Status (Available, Booked, Occupied)
 */
 function SensorCard(props) {
   let green = "#8ED264";
   let yellow = "#F4EC32";
   let red = "#E5414B";
-  const [sensorStatus, setsensorStatus] = useState(props.Avaiability);
+  const [sensorStatus, setsensorStatus] = useState(props.Status);
   const [sensorStatusColor, setsensorStatusColor] = useState(
-    props.Avaiability === "Online"
+    props.Status === "online"
       ? green
-      : props.Avaiability === "booked"
+      : props.Status === "booked"
       ? yellow
       : red
   );
 
   useEffect(() => {
     setsensorStatusColor(
-      sensorStatus === "Online"
+      sensorStatus === "online"
         ? green
         : sensorStatus === "booked"
         ? yellow

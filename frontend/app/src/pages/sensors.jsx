@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react'
+import axios from 'axios'
 import CardGrid from '../components/cardGrid/cardGrid'
 import SensorCard from '../components/sensorCard/sensorCard'
 import './styles/sensors.css'
@@ -8,46 +9,49 @@ function Sensors() {
   const [sensorAlreadyRegistered, setSensorAlreadyRegistered] = useState(false)
   const [sensorName, setSensorName] = useState("")
   const [sensorRoom, setSensorRoom] = useState("")
-  const [sensorRegisteredDate, setSensorRegisteredDate] = useState("")
-  const [sensorLastUpdated, setSensorLastUpdated] = useState("")
-  const [sensorStatus, setSensorStatus] = useState("")
+  const [sensorHouse, setSensorHouse] = useState("")
   const [sensorMacAddress, setSensorMacAddress] = useState("")
 
   const [sensorData, setSensorData] = useState([])
+  const [recordedSensorNames, setRecordedSensorNames] = useState([])
+  const client = axios.create({
+    baseURL: "http://localhost:8080/api",
+  })
+
 
   useEffect(() => {
-    //fetch sensor data from backend
-    setSensorData(fakeSensorData)
+    // Query the API, with axios
+    const fetchData = async () => {
+      client.get('/current').then((response) => { 
+        setSensorData(response.data);
+      });
+    }
+    fetchData()
+    sensorData.forEach(obj => {
+      recordedSensorNames.push(obj.room)
+    })
   }, [])
 
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    //setSensorAlreadyRegistered(true), backend call to check (by MAC address) if sensor is already registered
-    setSensorRegisteredDate(new Date()) //set to current date
-    setSensorLastUpdated(new Date()) //set to current date
+    setSensorAlreadyRegistered(false)
     console.log('Sensor Name:', sensorName)
-    console.log('Sensor Room:', sensorRoom)
+    console.log('Sensor House:', sensorHouse)
     console.log('Sensor Mac Address:', sensorMacAddress)
-    console.log('Sensor Registered Date:', sensorRegisteredDate)
-    console.log('Sensor Last Updated:', sensorLastUpdated)
-    //Assuming everything is correct, send data to backend and await confirmation to setSensorStatus('Registered')
-    //setSensorStatus('Registered')
-  }
 
-  const fakeSensorData = [
-    {
-      sensorName: 'F4015-1',
-      sensorRoom: 'F4015',
-      sensorRegisteredDate: '2021-06-01 12:00:00',
-      sensorLastUpdated: '2021-06-01'
-    },
-    {
-      sensorName: 'F4015-2',
-      sensorRoom: 'F4015',
-      sensorRegisteredDate: '2021-06-01 12:00:00',
-      sensorLastUpdated: '2021-06-01'
-    }]
+    if(recordedSensorNames.includes(sensorRoom)) {
+      setSensorAlreadyRegistered(true)
+      return;
+    }
+    client.post('/add-room', {
+      Name: sensorName,
+      Sensor: sensorMacAddress,
+      Buidling: sensorHouse,
+    }).then((response) => {
+      console.log(response)
+    })
+  }
 
   return (
     <div>
@@ -59,13 +63,13 @@ function Sensors() {
           <h1>List of Sensors</h1>
         <CardGrid>
           {
-            fakeSensorData.map((sensor) => {
+            sensorData.map((sensor) => {
               return (
                 <SensorCard
-                  key={sensor.sensorName}
-                  RoomName={sensor.sensorName}
-                  RoomHouse={sensor.sensorRoom}
-                  Avaiability={"Online"}
+                  key={sensor.room}
+                  RoomName={sensor.room}
+                  RoomHouse={sensor.building}
+                  Status={"online"}
                 />
               )
             })
@@ -93,6 +97,16 @@ function Sensors() {
             value={sensorRoom}
             onChange={(e) => setSensorRoom(e.target.value)}
             placeholder='Eg. F4015'
+          />
+        </label>        
+        <label>
+          House
+          <input
+            type="text"
+            className="sensor-form-input"
+            value={sensorHouse}
+            onChange={(e) => setSensorHouse(e.target.value)}
+            placeholder='Fysikhuset'
           />
         </label>
         <label>
