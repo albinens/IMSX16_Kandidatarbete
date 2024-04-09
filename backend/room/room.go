@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"example.com/m/v2/database"
+	"example.com/m/v2/utils"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
@@ -163,6 +164,60 @@ func RoomOccupancyPerDayOfWeek(from, to time.Time) (*WeekdayAverageRoomOccupancy
 	}
 
 	return toWeekdayAverage(data), nil
+}
+
+type RawRoomData map[string][]struct {
+	Timestamp time.Time
+	Occupancy float64
+}
+
+func RawDataBetween(from, to time.Time, resolution string) (RawRoomData, error) {
+	if from.After(to) {
+		return make(RawRoomData), errors.New("from date must be before to date")
+	}
+
+	if !utils.ValidTimeUnit(resolution) {
+		return make(RawRoomData), errors.New("invalid resolution")
+	}
+
+	reader := database.TimeSeriesReader()
+	query := fmt.Sprintf(`
+		from(bucket: "liveinfo")
+		|> range(start: %d, stop: %d)
+		|> filter(fn: (r) => r._measurement == "status")
+		|> filter(fn: (r) => r._field == "number_of_people")
+		|> aggregateWindow(every: %s, fn: mean, createEmpty: false)
+	`, from.Unix(), to.Unix(), resolution)
+
+	result, err := reader.Query(context.Background(), query)
+	if err != nil {
+		return make(RawRoomData), errors.Wrap(err, "failed to query influxdb for room occupancy per day of week")
+	}
+
+	rooms := make(RawRoomData)
+	for result.Next() {
+		room := result.Record().ValueByKey("room").(string)
+		if _, ok := rooms[room]; !ok {
+			rooms[room] = make([]struct {
+				Timestamp time.Time
+				Occupancy float64
+			}, 0)
+		}
+
+		if result.Record().Value() == nil {
+			continue
+		}
+
+		rooms[room] = append(rooms[room], struct {
+			Timestamp time.Time
+			Occupancy float64
+		}{
+			Timestamp: result.Record().Time(),
+			Occupancy: result.Record().Value().(float64),
+		})
+	}
+
+	return rooms, nil
 }
 
 func dataBetween(from, to time.Time) (*api.QueryTableResult, error) {
