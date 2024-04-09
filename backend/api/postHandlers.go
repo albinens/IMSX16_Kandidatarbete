@@ -13,7 +13,7 @@ import (
 func addRoom(w http.ResponseWriter, r *http.Request) {
 	var roomToAdd struct {
 		Name     string `json:"name"`
-		Sensor   string `json:"sensor"`
+		Sensor   string `json:"mac-address"`
 		Building string `json:"building"`
 	}
 
