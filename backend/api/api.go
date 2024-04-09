@@ -114,6 +114,12 @@ func addRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if roomToAdd.Name == "" || roomToAdd.Sensor == "" || roomToAdd.Building == "" {
+		utils.WriteHttpError(w, "No fields can be empty", http.StatusBadRequest)
+		slog.DebugContext(r.Context(), "Empty fields sent to create room", "room", roomToAdd)
+		return
+	}
+
 	if err := room.AddRoom(roomToAdd.Name, roomToAdd.Sensor, roomToAdd.Building); err != nil {
 		if strings.HasPrefix(err.Error(), "pq: duplicate key value violates unique constraint") {
 			utils.WriteHttpError(w, "Room already exists", http.StatusConflict)
