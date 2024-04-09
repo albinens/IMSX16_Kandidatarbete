@@ -6,6 +6,7 @@ import SearchRooms from './pages/searchRooms'
 import Layout from './layout';
 import Settings from './pages/settings';
 import Sensors from './pages/sensors';
+import DataBoard from './pages/dataBoard';
 
 function App() {
   return(
@@ -16,6 +17,7 @@ function App() {
           <Route path="search" element={<SearchRooms />}/>
           <Route path="settings" element={<Settings />}/>
           <Route path='sensors' element={<Sensors />}/>
+          <Route path='databoard' element={<DataBoard />}/>
         </Route>
       </Routes>
     </BrowserRouter>

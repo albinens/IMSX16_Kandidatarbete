@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react'
 import axios from 'axios'
 import CardGrid from '../components/cardGrid/cardGrid'
 import SensorCard from '../components/sensorCard/sensorCard'
+import HorizontalLegend from '../components/legends/horizontalLegend/horizontalLegend'
 import './styles/sensors.css'
 
 function Sensors() {
@@ -61,6 +62,7 @@ function Sensors() {
       <div className='two-column-wrapper-sensors'>
         <div className='left-column-sensors'>
           <h1>List of Sensors</h1>
+          <HorizontalLegend green="Active" yellow="Warning" red="Not Responding"/>
         <CardGrid>
           {
             sensorData.map((sensor) => {
