@@ -7,6 +7,9 @@ import './styles/sensors.css'
 
 function Sensors() {
 
+
+  const API_KEY = import.meta.env.API_KEY
+
   const [sensorAlreadyRegistered, setSensorAlreadyRegistered] = useState(false)
   const [sensorName, setSensorName] = useState("")
   const [sensorRoom, setSensorRoom] = useState("")
@@ -17,7 +20,11 @@ function Sensors() {
   const [recordedSensorNames, setRecordedSensorNames] = useState([])
   const client = axios.create({
     baseURL: "http://localhost:8080/api",
+    headers: {
+      'X-API-KEY': 'super_secret_key'
+    }
   })
+
 
 
   useEffect(() => {
@@ -45,13 +52,16 @@ function Sensors() {
       setSensorAlreadyRegistered(true)
       return;
     }
+    console.log(API_KEY)
     client.post('/add-room', {
-      Name: sensorName,
-      Sensor: sensorMacAddress,
-      Buidling: sensorHouse,
+      "name": sensorName,
+      "mac-address": sensorMacAddress,
+      "building": sensorHouse,
     }).then((response) => {
       console.log(response)
-    })
+    }).catch((error) => {
+      console.log(error)
+    });
   }
 
   return (
