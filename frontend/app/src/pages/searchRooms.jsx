@@ -1,7 +1,9 @@
 import React, {useEffect, useState} from 'react'
+import axios from 'axios'
 import CardGrid from '../components/cardGrid/cardGrid'
 import RoomCard from '../components/roomCard/roomCard'
 import HorizontalLegend from '../components/legends/horizontalLegend/horizontalLegend'
+import './styles/search.css'
 
 function SearchRooms() {
 
@@ -10,17 +12,21 @@ function SearchRooms() {
   const [searchResults, setSearchResults] = useState([])
 
 
+  const client = axios.create({
+    baseURL: "http://localhost:8080/api",
+  })
+
   const handleSearch = (e) => {
       setSearchQuery(e.target.value)
       console.log(searchQuery)
       if(e.target.value === ''){
-        setSearchResults(fakeData) //Change to API data
+        setSearchResults(apiData) 
       }
   }
 
   const handleSearchButton = () => {
-    let filteredData = fakeData.filter((room) => { //Change to API data
-      return room.roomName.toLowerCase().includes(searchQuery.toLowerCase())
+    let filteredData = apiData.filter((room) => { //Change to API data
+      return room.room.toLowerCase().includes(searchQuery.toLowerCase())
     })
     setSearchResults(filteredData)
     console.log(searchResults)
@@ -32,43 +38,15 @@ function SearchRooms() {
     }
   }
 
-  const fakeData = [
-    {
-      roomName: 'Vasa G-14',
-      house: 'Vasa',
-      avaiability: 'Available'
-    },
-    {
-      roomName: 'EG3503',
-      house: 'EDIT',
-      avaiability: 'Booked'
-    },
-    {
-      roomName: 'F4058',
-      house: 'Fysikhuset',
-      avaiability: 'Occupied'
-    },
-    {
-      roomName: 'M1215B',
-      house: 'Maskinhuset',
-      avaiability: 'Available'
-    },
-    {
-      roomName: 'SB-G303',
-      house: 'SB-huset',
-      avaiability: 'Available'
-    },
-    {
-      roomName: 'M1214E',
-      house: 'Maskinhuset',
-      avaiability: 'Occupied'
-    }
-  ]
-
   useEffect(() => {
     // fetch data from api
-    // setApiData(data)
-    setSearchResults(fakeData) //Change to API data
+    const fetchData = async () => {
+      client.get('/current').then((response) => { 
+        setApiData(response.data);
+      });
+    }
+    fetchData()
+    setSearchResults(apiData) 
   }, [])
 
   return (
@@ -95,16 +73,18 @@ function SearchRooms() {
       <CardGrid search>
         {
           searchResults.map((room, index) => {
-            return (
-              <>
-                <RoomCard 
-                  key={room.roomName} 
-                  RoomName={room.roomName} 
-                  RoomHouse={room.house} 
-                  Avaiability={room.avaiability} 
+            if (room.status !== "") {
+              return (
+                <RoomCard
+                  key={room.room}
+                  RoomName={room.room}
+                  RoomHouse={room.building}
+                  Avaiability={room.status}
                 />
-              </>
-            )
+              );
+            } else {
+              return null; // Return null for non-available rooms (optional)
+            }
           })
         }
       </CardGrid>

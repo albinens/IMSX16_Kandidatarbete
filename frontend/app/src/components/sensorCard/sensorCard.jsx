@@ -1,35 +1,35 @@
 import React, { useEffect, useState } from "react";
 
-import "./roomCard.css";
+import "./sensorCard.css";
 
 /*
 Props: 
  - RoomName
  - RoomHouse
- - Avaiability (Available, Booked, Occupied)
+ - Status (Available, Booked, Occupied)
 */
-function RoomCard(props) {
+function SensorCard(props) {
   let green = "#8ED264";
   let yellow = "#F4EC32";
   let red = "#E5414B";
-  const [roomStatus, setRoomStatus] = useState(props.Avaiability);
-  const [roomStatusColor, setRoomStatusColor] = useState(
-    props.Avaiability === "available"
+  const [sensorStatus, setsensorStatus] = useState(props.Status);
+  const [sensorStatusColor, setsensorStatusColor] = useState(
+    props.Status === "online"
       ? green
-      : props.Avaiability === "booked"
+      : props.Status === "booked"
       ? yellow
       : red
   );
 
   useEffect(() => {
-    setRoomStatusColor(
-      roomStatus === "available"
+    setsensorStatusColor(
+      sensorStatus === "online"
         ? green
-        : roomStatus === "booked"
+        : sensorStatus === "booked"
         ? yellow
         : red
     );
-  }, [roomStatus])
+  }, [sensorStatus])
 
   return (
     <div className="mobile-room-card-root">
@@ -46,7 +46,7 @@ function RoomCard(props) {
         <div 
           className="mobile-room-card-availability-circle"
           style={{
-            backgroundColor: roomStatusColor
+            backgroundColor: sensorStatusColor
           }} 
         />
       </div>
@@ -54,4 +54,4 @@ function RoomCard(props) {
   );
 }
 
-export default RoomCard;
+export default SensorCard;
