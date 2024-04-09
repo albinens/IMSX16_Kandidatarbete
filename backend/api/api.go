@@ -15,7 +15,7 @@ func Init() {
 	mux := http.NewServeMux()
 
 	apiDocs := http.StripPrefix("/api", http.FileServer(http.Dir("../docs")))
-	mux.Handle("GET /api/", apiDocs)
+	mux.Handle("GET /", apiDocs)
 
 	mux.HandleFunc("GET /api/current", currentStatus)
 	mux.HandleFunc("GET /api/current/{room}", roomStatus)
