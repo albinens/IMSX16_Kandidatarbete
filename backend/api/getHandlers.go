@@ -51,39 +51,29 @@ func rawSerialData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := make([]struct {
-		RoomName string `json:"roomName"`
-		Data     []struct {
-			Timestamp int64   `json:"timestamp"`
-			Occupancy float64 `json:"occupancy"`
-		} `json:"data"`
-	}, 0)
+	type responseDataType struct {
+		Timestamp int64   `json:"timestamp"`
+		Occupancy float64 `json:"occupancy"`
+	}
+
+	type responseType struct {
+		RoomName string             `json:"roomName"`
+		Data     []responseDataType `json:"data"`
+	}
+
+	response := make([]responseType, 0)
 
 	for room, data := range result {
-		convertedData := make([]struct {
-			Timestamp int64   `json:"timestamp"`
-			Occupancy float64 `json:"occupancy"`
-		}, 0, len(data))
-
+		convertedData := make([]responseDataType, 0, len(data))
 		for _, entry := range data {
-			convertedData = append(convertedData, struct {
-				Timestamp int64   `json:"timestamp"`
-				Occupancy float64 `json:"occupancy"`
-			}{
+			convertedData = append(convertedData, responseDataType{
 				Timestamp: entry.Timestamp.Unix(),
 				Occupancy: entry.Occupancy,
 			})
 		}
 
-		response = append(response, struct {
-			RoomName string `json:"roomName"`
-			Data     []struct {
-				Timestamp int64   `json:"timestamp"`
-				Occupancy float64 `json:"occupancy"`
-			} `json:"data"`
-		}{
-			RoomName: room,
-			Data:     convertedData,
+		response = append(response, responseType{RoomName: room,
+			Data: convertedData,
 		})
 	}
 
