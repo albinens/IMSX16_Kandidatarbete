@@ -20,3 +20,23 @@
   align-items: center;
   justify-content: center;
 }
+
+.week-table-dataBoard {
+  width: 100%;
+  margin-top: 2vh;
+}
+
+.week-table-dataBoard tr {
+  background-color: #f2f2f2;
+}
+
+.week-table-dataBoard tr th {
+  background-color: #f2f2f2;
+  padding: 8px;
+  text-align: center;
+}
+
+.week-table-dataBoard tr td {
+  padding: 8px;
+  text-align: center;
+}
