@@ -3,12 +3,6 @@ import './weekChart.css'
 
 const Legend = ({ data, selectedItems, onChange }) => {
 
-const checked = (name) => {
-  if(selectedItems === undefined || selectedItems.length === 0) return false;
-
-  return selectedItems.includes(name);
-}
-
 return(
     <div className="legendContainer-weekplot">
       {data.map((d) => (
@@ -17,7 +11,7 @@ return(
             <input
               type="checkbox"
               value={d.name}
-              checked={checked(d.name)}
+              checked={selectedItems === undefined ? false : selectedItems.includes(d.name)}
               onChange={() => onChange(d.name)}
             />
           )}
