@@ -70,6 +70,8 @@ function Sensors() {
         <h1>Sensors</h1>
       </div>
       <div className='two-column-wrapper-sensors'>
+
+        {/* LEFT COLUMN */}
         <div className='left-column-sensors'>
           <h1>List of Sensors</h1>
           <HorizontalLegend green="Active" yellow="Warning" red="Not Responding"/>
@@ -82,12 +84,16 @@ function Sensors() {
                   RoomName={sensor.room}
                   RoomHouse={sensor.building}
                   Status={"online"}
+                  sensorData={sensorData}
+                  sensorDataSetter={setSensorData}
                 />
               )
             })
           }
         </CardGrid>
         </div>
+
+        {/* RIGHT COLUMN */}
         <div className='right-column-sensors'>
         <h1>Register Sensor</h1>
           <form className='sensor-register-form'>
