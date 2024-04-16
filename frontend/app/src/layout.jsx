@@ -1,30 +1,14 @@
-import React, {useState, useEffect} from 'react'
+import React from 'react'
 import {Outlet, Link} from 'react-router-dom'
 
-
-import MobileNav from './components/mobileNav/mobileNav'
-import DesktopNav from './components/desktopNav/desktopNav'
+import ResponsiveAppBar from './components/mui/responsiveAppBar/responsiveAppBar'
 
 const Layout = () => {
 
-  let mobileWidth = 700;
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-
-  useEffect(() => {
-    const updateWindowDimensions = () => {
-      const newWindowWidth = window.innerWidth;
-      setWindowWidth(newWindowWidth);
-    };
-
-    window.addEventListener("resize", updateWindowDimensions);
-    return () => window.removeEventListener("resize", updateWindowDimensions) 
-
-  }, []);
   return (
     <>
-      {windowWidth >= mobileWidth ? <DesktopNav /> : null}
+      <ResponsiveAppBar /> 
       <Outlet />
-      {windowWidth < mobileWidth ? <MobileNav /> : null}
     </>
   )
 }
