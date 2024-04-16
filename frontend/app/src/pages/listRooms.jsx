@@ -3,7 +3,7 @@ import CardGrid from '../components/cardGrid/cardGrid'
 import RoomCard from '../components/roomCard/roomCard'
 import HorizontalLegend from '../components/legends/horizontalLegend/horizontalLegend'
 import axios from 'axios'
-import { Autocomplete, TextField } from '@mui/material'
+import { Autocomplete, Checkbox, TextField } from '@mui/material'
 
 function ListRooms() {
 
@@ -14,6 +14,11 @@ function ListRooms() {
   
   const [data, setData] = useState([])
   const [roomNames, setRoomNames] = useState([])
+
+  //Checkbox states
+  const [availableCheckBox, setAvailableCheckBox] = useState(true)
+  const [reservedCheckBox, setReservedCheckBox] = useState(false)
+  const [occupiedCheckBox, setOccupiedCheckBox] = useState(false)
 
   const client = axios.create({
     baseURL: "http://localhost:8080/api",
@@ -53,22 +58,35 @@ function ListRooms() {
 
   return (
     <>
-    <div className='page-header' style={windowWidth < 768 ? {marginTop:"3vh"} : {marginTop:"6vh"}}>
-      <h1>Available Rooms</h1>
-    </div>
+    <h1 style={{marginTop: "10vh", textAlign: "center"}}>Search for Rooms</h1>
     <Autocomplete
       disablePortal
       id="find-a-room-box-demo"
       options={roomNames}
       sx={{ width: 300 }}
       renderInput={(params) => <TextField {...params} label="Find a room" />}
-      style={{margin: "0 auto", display: "block", width: "50%"}}
+      style={{margin: "0 auto", display: "block", width: "50%", marginBottom: "2vh"}}
     />
-    <HorizontalLegend />
+      <div className='page-header' style={{marginTop: "3vh"}}>
+        <h1>Rooms</h1>
+      </div>
+      
+      <div style={{marginLeft: "12vw"}}>
+        <Checkbox checked={availableCheckBox} color="success" onChange={() => setAvailableCheckBox(!availableCheckBox)}/>
+        <label>Available</label>
+
+        <Checkbox  checked={reservedCheckBox} color="warning" onChange={() => setReservedCheckBox(!reservedCheckBox)}/>
+        <label>Reserved</label>
+
+        <Checkbox checked={occupiedCheckBox}  color="error" onChange={() => setOccupiedCheckBox(!occupiedCheckBox)}/>
+        <label>Occupied</label>
+      </div>
       <CardGrid>
         {
           data.map((room, index) => {
-            if (room.status === "available") {
+            if (room.status === "available" && availableCheckBox 
+                || room.status === "occupied" && occupiedCheckBox 
+                || room.status === "booked" && reservedCheckBox) {
               return (
                 <RoomCard
                   key={room.room}
@@ -83,6 +101,7 @@ function ListRooms() {
           })
         }
       </CardGrid>
+      
     </>
   )
 }
