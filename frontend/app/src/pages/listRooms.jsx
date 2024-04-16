@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import CardGrid from '../components/cardGrid/cardGrid'
 import RoomCard from '../components/roomCard/roomCard'
 import HorizontalLegend from '../components/legends/horizontalLegend/horizontalLegend'
+import RoomCardAlt from '../components/roomCardAlt/roomCardAlt'
 import axios from 'axios'
 import { Autocomplete, Checkbox, TextField } from '@mui/material'
 
@@ -88,7 +89,7 @@ function ListRooms() {
                 || room.status === "occupied" && occupiedCheckBox 
                 || room.status === "booked" && reservedCheckBox) {
               return (
-                <RoomCard
+                <RoomCardAlt
                   key={room.room}
                   RoomName={room.room}
                   RoomHouse={room.building}
