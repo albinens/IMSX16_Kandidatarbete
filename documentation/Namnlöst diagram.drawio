@@ -1,35 +1,32 @@
-<mxfile host="app.diagrams.net" modified="2024-04-17T14:19:23.029Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36" etag="nR7_pKKNXvygC7lZh8UM" version="23.1.5" type="github">
+<mxfile host="app.diagrams.net" modified="2024-04-17T14:34:45.070Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36" etag="u_qHEUnfSnU7dJ0oBTj-" version="23.1.5" type="github">
   <diagram name="Sida-1" id="w6RZrU1ZV-0dpOdVAXzY">
-    <mxGraphModel dx="993" dy="568" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1323" dy="757" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="D9962-5oOaSnkQb-ab28-2" value="" style="shape=mxgraph.arrows2.wedgeArrowDashed2;html=1;bendable=0;startWidth=50;stepSize=15;rounded=0;strokeWidth=3;" edge="1" parent="1">
           <mxGeometry width="100" height="100" relative="1" as="geometry">
-            <mxPoint x="154.5" y="720" as="sourcePoint" />
-            <mxPoint x="154.5" y="610" as="targetPoint" />
+            <mxPoint x="164.5" y="272.5" as="sourcePoint" />
+            <mxPoint x="164.5" y="162.5" as="targetPoint" />
           </mxGeometry>
-        </mxCell>
-        <mxCell id="D9962-5oOaSnkQb-ab28-40" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;aspect=fixed;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;align=center;outlineConnect=0;shape=mxgraph.vvd.wi_fi;rotation=-135;strokeColor=none;" vertex="1" parent="1">
-          <mxGeometry x="338.10999999999996" y="217.5" width="65" height="65" as="geometry" />
         </mxCell>
         <mxCell id="D9962-5oOaSnkQb-ab28-46" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="D9962-5oOaSnkQb-ab28-41" target="D9962-5oOaSnkQb-ab28-45">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="D9962-5oOaSnkQb-ab28-41" value="" style="image;aspect=fixed;perimeter=ellipsePerimeter;html=1;align=center;shadow=0;dashed=0;fontColor=#4277BB;labelBackgroundColor=default;fontSize=12;spacingTop=3;image=img/lib/ibm/users/sensor.svg;" vertex="1" parent="1">
-          <mxGeometry x="115" y="550" width="80" height="80" as="geometry" />
+          <mxGeometry x="125" y="102.5" width="80" height="80" as="geometry" />
         </mxCell>
         <mxCell id="D9962-5oOaSnkQb-ab28-42" value="" style="verticalAlign=top;verticalLabelPosition=bottom;labelPosition=center;align=center;html=1;outlineConnect=0;gradientDirection=north;strokeWidth=2;shape=mxgraph.networks.users;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
-          <mxGeometry x="110" y="730" width="90" height="100" as="geometry" />
+          <mxGeometry x="120" y="282.5" width="90" height="100" as="geometry" />
         </mxCell>
         <mxCell id="D9962-5oOaSnkQb-ab28-45" value="" style="ellipse;whiteSpace=wrap;html=1;verticalAlign=top;fontColor=#4277BB;labelBackgroundColor=default;shadow=0;dashed=0;spacingTop=3;" vertex="1" parent="1">
-          <mxGeometry x="310" y="497.5" width="185" height="185" as="geometry" />
+          <mxGeometry x="320" y="50" width="185" height="185" as="geometry" />
         </mxCell>
         <mxCell id="D9962-5oOaSnkQb-ab28-49" value="" style="verticalAlign=top;verticalLabelPosition=bottom;labelPosition=center;align=center;html=1;outlineConnect=0;fillColor=#008a00;strokeColor=#005700;gradientDirection=north;strokeWidth=2;shape=mxgraph.networks.mobile;fontColor=#ffffff;" vertex="1" parent="1">
-          <mxGeometry x="585" y="510" width="30" height="60" as="geometry" />
+          <mxGeometry x="595" y="62.5" width="30" height="60" as="geometry" />
         </mxCell>
         <mxCell id="D9962-5oOaSnkQb-ab28-50" value="" style="verticalAlign=top;verticalLabelPosition=bottom;labelPosition=center;align=center;html=1;outlineConnect=0;fillColor=#1ba1e2;strokeColor=#006EAF;gradientDirection=north;strokeWidth=2;shape=mxgraph.networks.monitor;fontColor=#ffffff;" vertex="1" parent="1">
-          <mxGeometry x="585" y="617.5" width="80" height="65" as="geometry" />
+          <mxGeometry x="595" y="170" width="80" height="65" as="geometry" />
         </mxCell>
         <mxCell id="D9962-5oOaSnkQb-ab28-59" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="D9962-5oOaSnkQb-ab28-56" target="D9962-5oOaSnkQb-ab28-50">
           <mxGeometry relative="1" as="geometry" />
@@ -38,7 +35,7 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="D9962-5oOaSnkQb-ab28-56" value="" style="image;aspect=fixed;perimeter=ellipsePerimeter;html=1;align=center;shadow=0;dashed=0;fontColor=#4277BB;labelBackgroundColor=default;fontSize=12;spacingTop=3;image=img/lib/ibm/infrastructure/mobile_backend.svg;" vertex="1" parent="1">
-          <mxGeometry x="306.88" y="497.5" width="191.25" height="191.25" as="geometry" />
+          <mxGeometry x="316.88" y="50" width="191.25" height="191.25" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
