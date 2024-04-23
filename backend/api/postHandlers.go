@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"log/slog"
 	"net/http"
@@ -9,6 +10,47 @@ import (
 	"example.com/m/v2/room"
 	"example.com/m/v2/utils"
 )
+
+var global []int = make([]int, 0)
+
+func status(w http.ResponseWriter, r *http.Request) {
+	data := make([]map[string]interface{}, 0)
+	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+		utils.WriteHttpError(w, "Request body is malformed", http.StatusBadRequest)
+		slog.ErrorContext(r.Context(), "Failed to decode request body", "error", err)
+		return
+	}
+
+	if len(data) == 0 {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+
+	for _, dataItem := range data {
+		rawData, ok := dataItem["rawData"]
+		if !ok {
+			continue
+		}
+
+		stringData := rawData.(string)
+		if rawData == "" {
+			continue
+		}
+
+		bytes, err := hex.DecodeString(stringData)
+		if err != nil {
+			panic(err)
+		}
+
+		nr := int((bytes[11] << 4) >> 4)
+		global = append(global, nr)
+	}
+}
+
+func sendJson(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(global)
+}
 
 func addRoom(w http.ResponseWriter, r *http.Request) {
 	var roomToAdd struct {
