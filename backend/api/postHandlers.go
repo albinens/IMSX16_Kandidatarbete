@@ -42,7 +42,7 @@ func status(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 
-		nr := int((bytes[11] << 4) >> 4)
+		nr := int((bytes[11] & 0x0F))
 		global = append(global, nr)
 	}
 }
