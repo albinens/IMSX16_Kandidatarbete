@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import CardGrid from '../components/cardGrid/cardGrid'
-import RoomCard from '../components/roomCard/roomCard'
-import HorizontalLegend from '../components/legends/horizontalLegend/horizontalLegend'
 import RoomCardAlt from '../components/roomCardAlt/roomCardAlt'
 import axios from 'axios'
 import { Autocomplete, Checkbox, TextField } from '@mui/material'
@@ -20,6 +18,28 @@ function ListRooms() {
   const [availableCheckBox, setAvailableCheckBox] = useState(true)
   const [reservedCheckBox, setReservedCheckBox] = useState(false)
   const [occupiedCheckBox, setOccupiedCheckBox] = useState(false)
+
+  //Search bar state
+  const [searchValue, setSearchValue] = useState("")
+  const [resultsCard, setResultsCard] = useState(undefined)
+
+  const handleSearchValueChange = (value) => {
+    setSearchValue(value)
+    if(roomNames.includes(value)){
+      console.log("Room found", value)
+      setResultsCard(
+        <RoomCardAlt
+          key={`${value}-results`}
+          RoomName={value}
+          RoomHouse={"Building"}
+          Avaiability={"Available"}
+        />
+      )
+    } else {
+      console.log("Room not found", value)
+      setResultsCard(undefined)
+    }
+  }
 
   const client = axios.create({
     baseURL: "http://localhost:8080/api",
@@ -62,26 +82,38 @@ function ListRooms() {
     <h1 style={{marginTop: "10vh", textAlign: "center"}}>Search for Rooms</h1>
     <Autocomplete
       disablePortal
+      value={searchValue}
       id="find-a-room-box-demo"
       options={roomNames}
       sx={{ width: 300 }}
       renderInput={(params) => <TextField {...params} label="Find a room" />}
       style={{margin: "0 auto", display: "block", width: "50%", marginBottom: "2vh"}}
+      onChange={(event, value) => handleSearchValueChange(value)}
     />
+    <div style={{display: "flex", margin: "auto", justifyContent: "center"}}>
+    {
+      resultsCard
+    }
+    </div>
+
       <div className='page-header' style={{marginTop: "3vh"}}>
         <h1>Rooms</h1>
       </div>
       
-      <div style={{marginLeft: "12vw"}}>
-        <Checkbox checked={availableCheckBox} color="success" onChange={() => setAvailableCheckBox(!availableCheckBox)}/>
-        <label>Available</label>
+      <div style={{display: "flex", flexDirection:"row"}}>
+        <div style={{marginLeft: "12vw"}}>
+          <Checkbox checked={availableCheckBox} color="success" onChange={() => setAvailableCheckBox(!availableCheckBox)}/>
+          <label>Available</label>
 
-        <Checkbox  checked={reservedCheckBox} color="warning" onChange={() => setReservedCheckBox(!reservedCheckBox)}/>
-        <label>Reserved</label>
+          <Checkbox  checked={reservedCheckBox} color="warning" onChange={() => setReservedCheckBox(!reservedCheckBox)}/>
+          <label>Reserved</label>
 
-        <Checkbox checked={occupiedCheckBox}  color="error" onChange={() => setOccupiedCheckBox(!occupiedCheckBox)}/>
-        <label>Occupied</label>
+          <Checkbox checked={occupiedCheckBox}  color="error" onChange={() => setOccupiedCheckBox(!occupiedCheckBox)}/>
+          <label>Occupied</label>
+        </div>
+        <p style={{marginLeft: "15px", fontSize: "small"}}>*Reserved means that the room is booked but not in use</p>
       </div>
+
       <CardGrid>
         {
           data.map((room, index) => {

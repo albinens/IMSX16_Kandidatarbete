@@ -44,6 +44,7 @@ function SensorCard(props) {
     client.delete(remStr, {})
     .then((response) => {
       console.log(response)
+      props.sensorDataSetter(...props.sensorData.filter((sensor) => sensor.room !== props.RoomName))
     })
     .catch((error) => {
       console.log(error)

@@ -1,5 +1,6 @@
 import React from "react";
 import './weekChart.css'
+import Checkbox from "@mui/material/Checkbox";
 
 const Legend = ({ data, selectedItems, onChange }) => {
 
@@ -8,9 +9,9 @@ return(
       {data.map((d) => (
         <div className="checkbox" style={{ color: d.color }} key={d.name}>
           {(
-            <input
+            <Checkbox
               type="checkbox"
-              value={d.name}
+              
               checked={selectedItems === undefined ? false : selectedItems.includes(d.name)}
               onChange={() => onChange(d.name)}
             />

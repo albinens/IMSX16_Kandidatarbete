@@ -34,7 +34,7 @@ export default function RoomCardAlt(props) {
   }, [roomStatus])
 
   return (
-    <Card sx={{ minWidth: 200, maxHeight: 160 }} style={{borderRadius: "8px", margin: "8px"}}>
+    <Card sx={{ minWidth: 200, maxHeight: 160, maxWidth: 200 }} style={{borderRadius: "8px", margin: "8px"}}>
       <CardContent>
         <Typography variant="h5" component="div">
           {props.RoomName}
