@@ -11,22 +11,22 @@ import (
 	"example.com/m/v2/utils"
 )
 
+const (
+	DATA_BYTE          int  = 11
+	FRAME_VERSION_BYTE int  = 8
+	FRAME_VERSION      byte = 0x18
+	DATA_MASK          byte = 0x0F
+)
+
 type StatusData struct {
 	MacAdress  string
 	NrOfPeople int64
 }
 
-func (s *StatusData) Mac() string {
-	return s.MacAdress
-}
-
-func (s *StatusData) Nr_of_people() int64 {
-	return s.NrOfPeople
-}
-
 func ParseStatus(w http.ResponseWriter, r *http.Request) ([]StatusData, error) {
 	data := make([]map[string]interface{}, 0)
 	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+		utils.WriteHttpError(w, "Request body is malformed", http.StatusBadRequest)
 		slog.ErrorContext(r.Context(), "Failed to decode request body", "error", err)
 		return nil, errors.New("request body is malformed")
 	}
@@ -59,15 +59,9 @@ func ParseStatus(w http.ResponseWriter, r *http.Request) ([]StatusData, error) {
 			continue
 		}
 
-		roomFound := false
-		for _, room := range rooms {
-			if room.Sensor == macString {
-				roomFound = true
-				break
-			}
-		}
-
-		if !roomFound {
+		if utils.IsInListFunc(rooms, func(r room.RoomDBObject) bool {
+			return r.Sensor == macString
+		}) {
 			continue
 		}
 
@@ -87,11 +81,11 @@ func ParseStatus(w http.ResponseWriter, r *http.Request) ([]StatusData, error) {
 			return nil, errors.New("failed to decode hex string")
 		}
 
-		if bytes[8] != 0x18 {
+		if bytes[FRAME_VERSION_BYTE] != FRAME_VERSION {
 			continue
 		}
 
-		nr := int64((bytes[11] & 0x0F))
+		nr := int64((bytes[DATA_BYTE] & DATA_MASK))
 
 		parsedData = append(parsedData, StatusData{
 			MacAdress:  macString,

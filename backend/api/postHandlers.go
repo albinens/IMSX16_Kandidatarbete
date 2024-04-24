@@ -11,11 +11,6 @@ import (
 	"example.com/m/v2/utils"
 )
 
-type StatusData interface {
-	Mac() string
-	Nr_of_people() int64
-}
-
 func status(w http.ResponseWriter, r *http.Request) {
 	data, err := g1gateway.ParseStatus(w, r)
 	if err != nil {
@@ -33,18 +28,18 @@ func status(w http.ResponseWriter, r *http.Request) {
 	for _, statusData := range data {
 		statusRoom := ""
 		for _, room := range rooms {
-			if room.Sensor == statusData.Mac() {
+			if room.Sensor == statusData.MacAdress {
 				statusRoom = room.Name
 				break
 			}
 		}
 
 		if statusRoom == "" {
-			slog.WarnContext(r.Context(), "Room not found", "room", statusData.Mac())
+			slog.WarnContext(r.Context(), "Room not found", "room", statusData.MacAdress)
 			continue
 		}
 
-		room.AddStatus(statusRoom, statusData.Nr_of_people())
+		room.AddStatus(statusRoom, statusData.NrOfPeople)
 	}
 
 	w.WriteHeader(http.StatusCreated)
