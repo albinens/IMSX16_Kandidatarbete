@@ -7,7 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"example.com/m/v2/room"
+	"example.com/m/v2/sensor"
 	"example.com/m/v2/utils"
 )
 
@@ -35,13 +35,6 @@ func ParseStatus(w http.ResponseWriter, r *http.Request) ([]StatusData, error) {
 		return make([]StatusData, 0), nil
 	}
 
-	rooms, err := room.AllRooms()
-	if err != nil {
-		utils.WriteHttpError(w, "Internal server error", http.StatusInternalServerError)
-		slog.ErrorContext(r.Context(), "Failed to get all rooms", "error", err)
-		return nil, errors.New("failed to get all rooms")
-	}
-
 	parsedData := make([]StatusData, 0)
 	for _, dataItem := range data {
 		mac, ok := dataItem["mac"]
@@ -54,14 +47,7 @@ func ParseStatus(w http.ResponseWriter, r *http.Request) ([]StatusData, error) {
 			continue
 		}
 
-		if macString == "" {
-			slog.ErrorContext(r.Context(), "Mac address is empty", "mac", macString)
-			continue
-		}
-
-		if utils.IsInListFunc(rooms, func(r room.RoomDBObject) bool {
-			return r.Sensor == macString
-		}) {
+		if _, err := sensor.RoomFromMac(macString); err != nil {
 			continue
 		}
 

@@ -8,6 +8,7 @@ import (
 
 	g1gateway "example.com/m/v2/api/g1_gateway"
 	"example.com/m/v2/room"
+	"example.com/m/v2/sensor"
 	"example.com/m/v2/utils"
 )
 
@@ -18,20 +19,12 @@ func status(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rooms, err := room.AllRooms()
-	if err != nil {
-		utils.WriteHttpError(w, "Internal server error", http.StatusInternalServerError)
-		slog.ErrorContext(r.Context(), "Failed to get all rooms", "error", err)
-		return
-	}
-
 	for _, statusData := range data {
-		statusRoom := ""
-		for _, room := range rooms {
-			if room.Sensor == statusData.MacAdress {
-				statusRoom = room.Name
-				break
-			}
+		statusRoom, err := sensor.RoomFromMac(statusData.MacAdress)
+		if err != nil {
+			utils.WriteHttpError(w, "Internal server error", http.StatusInternalServerError)
+			slog.ErrorContext(r.Context(), "Failed to get room from mac", "error", err)
+			return
 		}
 
 		if statusRoom == "" {
