@@ -1,55 +1,53 @@
 package api
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"log/slog"
 	"net/http"
 	"strings"
 
+	g1gateway "example.com/m/v2/api/g1_gateway"
 	"example.com/m/v2/room"
 	"example.com/m/v2/utils"
 )
 
-var global []int = make([]int, 0)
-
-func status(w http.ResponseWriter, r *http.Request) {
-	data := make([]map[string]interface{}, 0)
-	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
-		utils.WriteHttpError(w, "Request body is malformed", http.StatusBadRequest)
-		slog.ErrorContext(r.Context(), "Failed to decode request body", "error", err)
-		return
-	}
-
-	if len(data) == 0 {
-		w.WriteHeader(http.StatusNoContent)
-		return
-	}
-
-	for _, dataItem := range data {
-		rawData, ok := dataItem["rawData"]
-		if !ok {
-			continue
-		}
-
-		stringData := rawData.(string)
-		if rawData == "" {
-			continue
-		}
-
-		bytes, err := hex.DecodeString(stringData)
-		if err != nil {
-			panic(err)
-		}
-
-		nr := int((bytes[11] & 0x0F))
-		global = append(global, nr)
-	}
+type StatusData interface {
+	Mac() string
+	Nr_of_people() int64
 }
 
-func sendJson(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(global)
+func status(w http.ResponseWriter, r *http.Request) {
+	data, err := g1gateway.ParseStatus(w, r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	rooms, err := room.AllRooms()
+	if err != nil {
+		utils.WriteHttpError(w, "Internal server error", http.StatusInternalServerError)
+		slog.ErrorContext(r.Context(), "Failed to get all rooms", "error", err)
+		return
+	}
+
+	for _, statusData := range data {
+		statusRoom := ""
+		for _, room := range rooms {
+			if room.Sensor == statusData.Mac() {
+				statusRoom = room.Name
+				break
+			}
+		}
+
+		if statusRoom == "" {
+			slog.WarnContext(r.Context(), "Room not found", "room", statusData.Mac())
+			continue
+		}
+
+		room.AddStatus(statusRoom, statusData.Nr_of_people())
+	}
+
+	w.WriteHeader(http.StatusCreated)
 }
 
 func addRoom(w http.ResponseWriter, r *http.Request) {

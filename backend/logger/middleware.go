@@ -2,9 +2,9 @@ package logger
 
 import (
 	"context"
-	"log/slog"
+	// "log/slog"
 	"net/http"
-	"time"
+	// "time"
 )
 
 type RequestLoggerMiddleware struct {
@@ -17,10 +17,10 @@ func (l *RequestLoggerMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Reque
 	ctx = context.WithValue(ctx, TraceCtxKey, traceID)
 	r = r.WithContext(ctx)
 
-	slog.InfoContext(ctx, "Request started", "method", r.Method, "path", r.URL.Path)
-	start := time.Now()
+	// slog.InfoContext(ctx, "Request started", "method", r.Method, "path", r.URL.Path)
+	// start := time.Now()
 	l.handler.ServeHTTP(w, r)
-	slog.InfoContext(ctx, "Request finished", "method", r.Method, "path", r.URL.Path, "duration", time.Since(start))
+	// slog.InfoContext(ctx, "Request finished", "method", r.Method, "path", r.URL.Path, "duration", time.Since(start))
 }
 
 func NewRequestLoggerMiddleware(handlerToWrap http.Handler) *RequestLoggerMiddleware {

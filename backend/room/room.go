@@ -88,6 +88,11 @@ func RoomByName(name string) (*RoomDBObject, error) {
 	return &room, nil
 }
 
+func AddStatus(room string, numberOfPeople int64) {
+	dataPoint := CreateDataPoint(room, numberOfPeople, time.Now())
+	database.WriteTimeSeriesData(dataPoint)
+}
+
 func CreateDataPoint(room string, numberOfPeople int64, time time.Time) *write.Point {
 	p := influxdb2.NewPointWithMeasurement("status").AddTag("room", room).
 		AddField("number_of_people", numberOfPeople).

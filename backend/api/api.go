@@ -20,10 +20,10 @@ func Init() {
 	mux.HandleFunc("GET /api/current", currentStatus)
 	mux.HandleFunc("GET /api/current/{room}", roomStatus)
 	mux.HandleFunc("GET /api/stats/daily-average/{from}/{to}", dailyAverage)
+	mux.HandleFunc("GET /api/rooms", allRooms)
 
 	mux.Handle("POST /api/add-room", auth.TokenAuthMiddlewareFunc(addRoom))
 	mux.HandleFunc("POST /api/status", status)
-	mux.HandleFunc("GET /api/REMOVE_THIS_ENDPOINT", sendJson)
 
 	mux.Handle("DELETE /api/remove-room/{name}", auth.TokenAuthMiddlewareFunc(deleteRoom))
 
