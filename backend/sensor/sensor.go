@@ -1,6 +1,7 @@
 package sensor
 
 import (
+	"errors"
 	"time"
 
 	"example.com/m/v2/database"
@@ -15,8 +16,12 @@ func RoomFromMac(mac string) (string, error) {
 			return "", err
 		}
 	}
+	room, ok := cache[mac]
+	if !ok {
+		return "", errors.New("mac is not part of cache")
+	}
 
-	return cache[mac], nil
+	return room, nil
 }
 
 func Update() error {

@@ -19,7 +19,7 @@ func (l *RequestLoggerMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Reque
 
 	// Skip logging for the status endpoint
 	// As that would be too much noise
-	if r.URL.Path == "/api/status" {
+	if r.URL.Path == "/api/report/status" {
 		l.handler.ServeHTTP(w, r)
 		return
 	}

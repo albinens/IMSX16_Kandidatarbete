@@ -116,7 +116,6 @@ func setupAuth(w http.ResponseWriter, r *http.Request) {
 func status(w http.ResponseWriter, r *http.Request) {
 	data, err := g1gateway.ParseStatus(w, r)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
