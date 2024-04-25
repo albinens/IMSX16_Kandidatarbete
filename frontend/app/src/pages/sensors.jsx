@@ -2,9 +2,13 @@ import React, {useEffect, useState} from 'react'
 import axios from 'axios'
 import CardGrid from '../components/cardGrid/cardGrid'
 import SensorCard from '../components/sensorCard/sensorCard'
+import HorizontalLegend from '../components/legends/horizontalLegend/horizontalLegend'
 import './styles/sensors.css'
 
 function Sensors() {
+
+
+  const API_KEY = import.meta.env.API_KEY
 
   const [sensorAlreadyRegistered, setSensorAlreadyRegistered] = useState(false)
   const [sensorName, setSensorName] = useState("")
@@ -16,7 +20,11 @@ function Sensors() {
   const [recordedSensorNames, setRecordedSensorNames] = useState([])
   const client = axios.create({
     baseURL: "http://localhost:8080/api",
+    headers: {
+      'X-API-KEY': 'super_secret_key'
+    }
   })
+
 
 
   useEffect(() => {
@@ -44,13 +52,16 @@ function Sensors() {
       setSensorAlreadyRegistered(true)
       return;
     }
+    console.log(API_KEY)
     client.post('/add-room', {
-      Name: sensorName,
-      Sensor: sensorMacAddress,
-      Buidling: sensorHouse,
+      "name": sensorName,
+      "mac-address": sensorMacAddress,
+      "building": sensorHouse,
     }).then((response) => {
       console.log(response)
-    })
+    }).catch((error) => {
+      console.log(error)
+    });
   }
 
   return (
@@ -59,8 +70,11 @@ function Sensors() {
         <h1>Sensors</h1>
       </div>
       <div className='two-column-wrapper-sensors'>
+
+        {/* LEFT COLUMN */}
         <div className='left-column-sensors'>
           <h1>List of Sensors</h1>
+          <HorizontalLegend green="Active" yellow="Warning" red="Not Responding"/>
         <CardGrid>
           {
             sensorData.map((sensor) => {
@@ -70,12 +84,16 @@ function Sensors() {
                   RoomName={sensor.room}
                   RoomHouse={sensor.building}
                   Status={"online"}
+                  sensorData={sensorData}
+                  sensorDataSetter={setSensorData}
                 />
               )
             })
           }
         </CardGrid>
         </div>
+
+        {/* RIGHT COLUMN */}
         <div className='right-column-sensors'>
         <h1>Register Sensor</h1>
           <form className='sensor-register-form'>

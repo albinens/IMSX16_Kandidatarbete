@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 func IsProduction() bool {
@@ -14,6 +15,20 @@ func IsProduction() bool {
 func LogFatal(s string, v ...any) {
 	slog.Error(s, v...)
 	os.Exit(1)
+}
+
+func ValidTimeUnit(unit string) bool {
+	_, err := strconv.Atoi(unit[:len(unit)-1])
+	if err != nil {
+		return false
+	}
+
+	switch unit[len(unit)-1] {
+	case 's', 'm', 'h', 'd':
+		return true
+	default:
+		return false
+	}
 }
 
 type errorResponse struct {
