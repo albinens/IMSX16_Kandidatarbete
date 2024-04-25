@@ -14,6 +14,32 @@ import (
 	"example.com/m/v2/utils"
 )
 
+func createKey(w http.ResponseWriter, r *http.Request) {
+	var key struct {
+		Key string `json:"key"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&key); err != nil {
+		utils.WriteHttpError(w, "Request body is malformed", http.StatusBadRequest)
+		slog.DebugContext(r.Context(), "Failed to decode request body", "error", err)
+		return
+	}
+
+	if key.Key == "" {
+		utils.WriteHttpError(w, "No fields can be empty", http.StatusBadRequest)
+		slog.DebugContext(r.Context(), "Empty fields sent to create key", "key", key)
+		return
+	}
+
+	if err := auth.CreateApiKey(r.Context(), key.Key); err != nil {
+		utils.WriteHttpError(w, "Internal server error", http.StatusInternalServerError)
+		slog.ErrorContext(r.Context(), "Failed to create api key", "error", err)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+}
+
 func setupAuth(w http.ResponseWriter, r *http.Request) {
 	var authRequest struct {
 		VerificationKey string `json:"verification_key"`
