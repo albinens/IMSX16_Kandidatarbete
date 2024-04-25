@@ -7,10 +7,58 @@ import (
 	"strings"
 
 	g1gateway "example.com/m/v2/api/g1_gateway"
+	"example.com/m/v2/auth"
+	"example.com/m/v2/env"
 	"example.com/m/v2/room"
 	"example.com/m/v2/sensor"
 	"example.com/m/v2/utils"
 )
+
+func setupAuth(w http.ResponseWriter, r *http.Request) {
+	var authRequest struct {
+		VerificationKey string `json:"verification_key"`
+		NewKey          string `json:"new_key"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&authRequest); err != nil {
+		utils.WriteHttpError(w, "Request body is malformed", http.StatusBadRequest)
+		slog.DebugContext(r.Context(), "Failed to decode request body", "error", err)
+		return
+	}
+
+	if authRequest.VerificationKey == "" || authRequest.NewKey == "" {
+		utils.WriteHttpError(w, "No fields can be empty", http.StatusBadRequest)
+		slog.DebugContext(r.Context(), "Empty fields sent to setup auth", "authRequest", authRequest)
+		return
+	}
+
+	keys, err := auth.ApiKeys()
+	if keys == nil {
+		utils.WriteHttpError(w, "Internal server error", http.StatusInternalServerError)
+		slog.ErrorContext(r.Context(), "Failed to get api keys", "error", err)
+		return
+	}
+
+	if len(keys) > 0 {
+		utils.WriteHttpError(w, "API key already set", http.StatusUnauthorized)
+		slog.WarnContext(r.Context(), "API key already set")
+		return
+	}
+
+	if env.InitialAuthKey != authRequest.VerificationKey {
+		utils.WriteHttpError(w, "Verification key is incorrect", http.StatusUnauthorized)
+		slog.WarnContext(r.Context(), "Verification key is incorrect")
+		return
+	}
+
+	if err := auth.CreateApiKey(r.Context(), authRequest.NewKey); err != nil {
+		utils.WriteHttpError(w, "Internal server error", http.StatusInternalServerError)
+		slog.ErrorContext(r.Context(), "Failed to create api key", "error", err)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+}
 
 func status(w http.ResponseWriter, r *http.Request) {
 	data, err := g1gateway.ParseStatus(w, r)

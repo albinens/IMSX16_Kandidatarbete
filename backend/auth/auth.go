@@ -50,6 +50,27 @@ func VerifyGatewayUserMiddlewareHandler(next http.Handler) http.Handler {
 	})
 }
 
+func ApiKeys() (keys []string, err error) {
+	rows, err := database.GetDB().Query("SELECT * FROM api_keys")
+	if err != nil {
+		slog.Error("Error while getting API keys: ", err)
+		return nil, err
+	}
+
+	for rows.Next() {
+		var key string
+		err = rows.Scan(&key)
+		if err != nil {
+			slog.Error("Error while getting API keys: ", err)
+			return nil, err
+		}
+
+		keys = append(keys, key)
+	}
+
+	return keys, nil
+}
+
 func verifyGatewayUser(ctx context.Context, username, password string) bool {
 	rows, err := database.GetDB().QueryxContext(ctx, "SELECT password FROM gateway_users WHERE username = $1", username)
 	if err != nil {
