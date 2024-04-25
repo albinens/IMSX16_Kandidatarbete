@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import axios from 'axios'
 import './styles/dataBoard.css';
 
@@ -6,10 +6,9 @@ import ChartContainer from '../components/dataCharts/chartContainer/chartContain
 
 const DataBoard = () => {
 
-  const [datasetGraph, setDatasetGraph] = React.useState(undefined)
-  
+  const [isLoading, setIsLoading] = React.useState(true)
+  const [datasetGraph, setDatasetGraph] = React.useState([])
   const [datasetTable, setDatasetTable] = React.useState(undefined)
-  const [processedTableData, setProcessedTableData] = React.useState(undefined)
 
   const client = axios.create({
     baseURL: "http://localhost:8080/api",
@@ -17,21 +16,29 @@ const DataBoard = () => {
       'X-API-KEY': 'super_secret_key'
     }
   })
-  useEffect(() => {
-    
+
+  //Graph data load (right column)
+  useMemo(() => {
     const fetchDataGraph = async () => {
-      client.get('/stats/raw-serial/1614556800000/1614643200000/5m')
+      let route = `/stats/raw-serial/1712860378/1713860378/5m`
+      client.get(route)
       .then((response) => {
         setDatasetGraph(response.data)
+        setIsLoading(false)
       }).catch((err) => {
         console.log(`Error fetching data ${err}`)
       })
     }
+    fetchDataGraph()
+    console.log('Data loaded dataBoard.jsx', datasetGraph)
+  },[isLoading])
 
+  //Table data load (left column)
+  useEffect(() => {
+    setIsLoading(true)
     const fetchDataTable = async () => {
       client.get('/stats/daily-average/1614556800000/1614643200000')
       .then((response) => {
-        console.log(response)
         let data = response.data
         //Sort based on name
         data.sort((a, b) => (a.roomName > b.roomName) ? 1 : -1)
@@ -41,10 +48,10 @@ const DataBoard = () => {
         console.log(`Error fetching data ${err}`)
       })
     }
-
-    fetchDataGraph()
     fetchDataTable()
-  },[])
+  }, [])
+
+
 
 
   return (
@@ -87,7 +94,8 @@ const DataBoard = () => {
         </div>
         {/* RIGHT COLUMN */ }
         <div className='right-column-dataBoard'>
-          <ChartContainer />
+          <ChartContainer dataSeries={datasetGraph}/>
+
         </div>
       </div>
     </>

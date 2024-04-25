@@ -33,6 +33,12 @@ function SensorCard(props) {
     );
   }, [sensorStatus])
 
+  const removeSensorAlert = () => {
+    if (window.confirm("Are you sure you want to remove this sensor?")) {
+      removeSensor()
+    }
+  }
+
   const removeSensor = () => {
     let remStr = "/remove-room/" + props.RoomName
     const client = axios.create({
@@ -69,7 +75,7 @@ function SensorCard(props) {
             backgroundColor: sensorStatusColor
           }} 
         />
-        <button onClick={() => removeSensor()}>
+        <button onClick={() => removeSensorAlert()}>
           <img src={DeleteIcon} alt="Delete Icon" />
         </button>
       </div>

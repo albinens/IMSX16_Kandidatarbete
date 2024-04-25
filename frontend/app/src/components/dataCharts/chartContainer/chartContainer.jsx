@@ -1,49 +1,81 @@
-import React, {useState} from "react";
-import WeekChart from "../weekChart/weekChart";
+import React, {useEffect, useMemo, useState} from "react";
+import { Chart } from 'react-google-charts';
 import Legend from "../weekChart/legend";
 
-//SAMPLE DATA
-import portfolio from "./portfolio.json";
-import schc from "./schc.json";
-import vcit from "./vcit.json";
 
-const ChartContainer = ({ dataSerie }) => {
+/**
+ * dataSeries format:
+ * [
+ *  {
+ *    name: string,
+ *    color: string,
+ *  items: [
+ *  {
+ *    data: number,
+ *    date: Date
+ *  }
+ *  ...]
+ * ...]
+ */
+const ChartContainer = (props) => {
 
-  const dimensions = {
-    width: 600,
-    height: 300,
-    margin: {
-      top: 30,
-      right: 30,
-      bottom: 30,
-      left: 60
-    }
-  };
-
-  //SAMPLE DATA
-  const portfolioData = {
-    name: "Portfolio",
-    color: "#000000",
-    items: portfolio.map((d) => ({ ...d, date: new Date(d.date) }))
-  };
-  const schcData = {
-    name: "SCHC",
-    color: "#d53e4f",
-    items: schc.map((d) => ({ ...d, date: new Date(d.date) }))
-  };
-  const vcitData = {
-    name: "VCIT",
-    color: "#5e4fa2",
-    items: vcit.map((d) => ({ ...d, date: new Date(d.date) }))
+  const chartOptions = {
+    title: "Recorded People in a Room",
+    hAxis: { title: "Time", viewWindow: { min: 1712860378, max: 1713860378 } },
+    vAxis: { title: "Recorded People", viewWindow: { min: 0, max: 15 } },
+    legend: "none"
   };
 
 
+  const [dataSeries, setDataSeries] = useState(props.dataSeries);
+  const [chartData, setChartData] = useState([]);
+  const [noChart, setNoChart] = useState(true);
   const [selectedItems, setSelectedItems] = useState([]);
-  const legendData = [portfolioData, schcData, vcitData];
-  const chartData = [
-    portfolioData,
-    ...[schcData, vcitData].filter((d) => selectedItems.includes(d.name))
-  ];
+
+
+  useEffect(() => {
+    let tempDataSeries = [];
+    let counter = 0;
+    const colors = 
+    [
+    "#000000", "#d53e4f", "#5e4fa2", "#3288bd", "#66c2a5", "#abdda4", "#e6f598", "#fee08b", "#fdae61", "#f46d43",
+    "#d53e4f", "#9e0142", "#5e4fa2", "#3288bd", "#66c2a5", "#abdda4", "#e6f598", "#fee08b", "#fdae61", "#f46d43",
+    "#5e4fa2", "#3288bd", "#66c2a5", "#abdda4", "#e6f598", "#fee08b", "#fdae61", "#f46d43", "#d53e4f", "#9e0142",
+    "#66c2a5", "#abdda4", "#e6f598", "#fee08b", "#fdae61", "#f46d43", "#d53e4f", "#9e0142", "#5e4fa2", "#3288bd"
+   ];
+    props.dataSeries.map((obj) => {
+        tempDataSeries.push({
+          name: obj.roomName,
+          color: colors[counter],
+          items: obj.data
+        })
+        counter++;
+    })
+    setDataSeries(tempDataSeries);
+    console.log('Data series', dataSeries)
+
+    let filteredData = dataSeries.filter((room) => selectedItems.includes(room.name))
+    .map((room) => {
+      return room.items.map((row) => {
+        return [row.timestamp, row.occupancy]
+      })
+    })
+
+    let destructedArray = []
+    filteredData.map(array => destructedArray.push(...array))
+
+    setChartData([
+      ["Time", "Number of People"],
+      [0, 0],
+      ...destructedArray
+    ])
+    console.log('Chart data', chartData)
+
+    setNoChart(chartData.length === 0);
+  }, [selectedItems]);
+
+  const legendData = dataSeries;
+
   const onChangeSelection = (name) => {
     const newSelectedItems = selectedItems.includes(name)
       ? selectedItems.filter((item) => item !== name)
@@ -53,12 +85,28 @@ const ChartContainer = ({ dataSerie }) => {
 
   return (
     <div className="chart-container">
-      <Legend 
-        data={legendData} 
-        onChange={onChangeSelection} 
-        legendData={selectedItems}
-      />
-      <WeekChart data={chartData} dimensions={dimensions} />
+
+      {
+        noChart ? <h1>No Data to Display</h1> :
+        <>
+          <Legend 
+          data={legendData} 
+          onChange={onChangeSelection} 
+          selectedItems={selectedItems}
+        />
+          <Chart
+            width={'700px'}
+            height={'400px'}
+            chartType="LineChart"
+            data={chartData}
+            options={chartOptions}
+            graphID="LineChart"
+          />
+        </>
+      }
+
+      <div className="chart">
+      </div>
     </div>
   );
 }
