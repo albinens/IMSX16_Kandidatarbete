@@ -19,6 +19,11 @@ CREATE TABLE IF NOT EXISTS rooms (
 CREATE TABLE IF NOT EXISTS api_keys (
 	key TEXT PRIMARY KEY
 );
+
+CREATE TABLE IF NOT EXISTS gateway_users (
+	username TEXT PRIMARY KEY,
+	password TEXT NOT NULL
+);
 `
 
 const devSchemaAdditions = `

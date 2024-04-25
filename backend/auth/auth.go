@@ -9,6 +9,72 @@ import (
 	"example.com/m/v2/utils"
 )
 
+func CreateGatewayUser(ctx context.Context, username, password string) error {
+	_, err := database.GetDB().ExecContext(ctx, "INSERT INTO gateway_users (username, password) VALUES ($1, $2)", username, password)
+	if err != nil {
+		slog.ErrorContext(ctx, "Error while creating gateway user: ", err)
+		return err
+	}
+
+	return nil
+}
+
+func CreateApiKey(ctx context.Context, key string) error {
+	_, err := database.GetDB().ExecContext(ctx, "INSERT INTO api_keys (key) VALUES ($1)", key)
+	if err != nil {
+		slog.ErrorContext(ctx, "Error while creating API key: ", err)
+		return err
+	}
+
+	return nil
+}
+
+func VerifyGatewayUserMiddlewareFunc(handler func(w http.ResponseWriter, r *http.Request)) http.Handler {
+	return VerifyGatewayUserMiddlewareHandler(http.HandlerFunc(handler))
+}
+
+func VerifyGatewayUserMiddlewareHandler(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		username, password, ok := r.BasicAuth()
+		if !ok {
+			utils.WriteHttpError(w, "You must provide a username and password.", http.StatusUnauthorized)
+			return
+		}
+
+		if !verifyGatewayUser(r.Context(), username, password) {
+			utils.WriteHttpError(w, "Invalid username or password.", http.StatusUnauthorized)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+func verifyGatewayUser(ctx context.Context, username, password string) bool {
+	rows, err := database.GetDB().QueryxContext(ctx, "SELECT password FROM gateway_users WHERE username = $1", username)
+	if err != nil {
+		slog.ErrorContext(ctx, "Error while verifying gateway user: ", err)
+		return false
+	}
+
+	if !rows.Next() {
+		return false
+	}
+
+	var storedPassword string
+	err = rows.Scan(&storedPassword)
+	if err != nil {
+		slog.ErrorContext(ctx, "Error while verifying gateway user: ", err)
+		return false
+	}
+
+	if storedPassword != password {
+		return false
+	}
+
+	return true
+}
+
 func TokenAuthMiddlewareFunc(handler func(w http.ResponseWriter, r *http.Request)) http.Handler {
 	return TokenAuthMiddlewareHandler(http.HandlerFunc(handler))
 }
