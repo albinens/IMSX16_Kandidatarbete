@@ -23,7 +23,7 @@ func Init() {
 	mux.HandleFunc("GET /api/rooms", allRooms)
 
 	mux.Handle("POST /api/add-room", auth.TokenAuthMiddlewareFunc(addRoom))
-	mux.HandleFunc("POST /api/status", status)
+	mux.HandleFunc("POST /api/report/status", status)
 
 	mux.Handle("DELETE /api/remove-room/{name}", auth.TokenAuthMiddlewareFunc(deleteRoom))
 
