@@ -28,7 +28,7 @@ func Init() {
 	mux.Handle("POST /api/auth/key/create", auth.TokenAuthMiddlewareFunc(createKey))
 
 	mux.Handle("DELETE /api/remove-room/{name}", auth.TokenAuthMiddlewareFunc(deleteRoom))
-	mux.Handle("DELETE /api/auth/key/delete", auth.TokenAuthMiddlewareFunc(deleteApiKey))
+	mux.Handle("DELETE /api/auth/key/revoke", auth.TokenAuthMiddlewareFunc(deleteApiKey))
 
 	wrappedMux := logger.NewRequestLoggerMiddleware(mux)
 

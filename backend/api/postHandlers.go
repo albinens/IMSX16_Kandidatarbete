@@ -59,7 +59,7 @@ func setupAuth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	keys, err := auth.ApiKeys()
-	if keys == nil {
+	if err != nil {
 		utils.WriteHttpError(w, "Internal server error", http.StatusInternalServerError)
 		slog.ErrorContext(r.Context(), "Failed to get api keys", "error", err)
 		return
