@@ -1,0 +1,11 @@
+.legendContainer-weekplot{
+  display: flex;
+  flex-direction: row;
+}
+
+.legendContainer-weekplot div{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-right: 10px;
+}

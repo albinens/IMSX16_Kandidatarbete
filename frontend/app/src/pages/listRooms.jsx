@@ -1,17 +1,45 @@
 import React, { useEffect, useState } from 'react'
 import CardGrid from '../components/cardGrid/cardGrid'
-import RoomCard from '../components/roomCard/roomCard'
-import HorizontalLegend from '../components/legends/horizontalLegend/horizontalLegend'
+import RoomCardAlt from '../components/roomCardAlt/roomCardAlt'
 import axios from 'axios'
+import { Autocomplete, Checkbox, TextField } from '@mui/material'
 
 function ListRooms() {
 
-  const API_URL = import.meta.env.API_URL
-  const API_KEY = import.meta.env.API_KEY
+  //const API_URL = import.meta.env.API_URL
+  //const API_KEY = import.meta.env.API_KEY
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   
   const [data, setData] = useState([])
+  const [roomNames, setRoomNames] = useState([])
+
+  //Checkbox states
+  const [availableCheckBox, setAvailableCheckBox] = useState(true)
+  const [reservedCheckBox, setReservedCheckBox] = useState(false)
+  const [occupiedCheckBox, setOccupiedCheckBox] = useState(false)
+
+  //Search bar state
+  const [searchValue, setSearchValue] = useState("")
+  const [resultsCard, setResultsCard] = useState(undefined)
+
+  const handleSearchValueChange = (value) => {
+    setSearchValue(value)
+    if(roomNames.includes(value)){
+      console.log("Room found", value)
+      setResultsCard(
+        <RoomCardAlt
+          key={`${value}-results`}
+          RoomName={value}
+          RoomHouse={"Building"}
+          Avaiability={"Available"}
+        />
+      )
+    } else {
+      console.log("Room not found", value)
+      setResultsCard(undefined)
+    }
+  }
 
   const client = axios.create({
     baseURL: "http://localhost:8080/api",
@@ -22,12 +50,23 @@ function ListRooms() {
     const fetchData = async () => {
       client.get('/current').then((response) => { 
         setData(response.data);
+        let tempRoom = [];
+        response.data.forEach(obj => {
+          console.log(obj.room)
+          if (!tempRoom.includes(obj.room)){
+            tempRoom.push(obj.room)
+          }
+          setRoomNames(tempRoom)
+        })
       });
     }
+
     fetchData()
+
     data.forEach(obj => {
       console.log(obj)
     })
+    console.log(roomNames)
   },[])
 
   useEffect(() => {
@@ -40,16 +79,49 @@ function ListRooms() {
 
   return (
     <>
-    <div className='page-header' style={windowWidth < 768 ? {marginTop:"3vh"} : {marginTop:"6vh"}}>
-      <h1>Available Rooms</h1>
+    <h1 style={{marginTop: "10vh", textAlign: "center"}}>Search for Rooms</h1>
+    <Autocomplete
+      disablePortal
+      value={searchValue}
+      id="find-a-room-box-demo"
+      options={roomNames}
+      sx={{ width: 300 }}
+      renderInput={(params) => <TextField {...params} label="Find a room" />}
+      style={{margin: "0 auto", display: "block", width: "50%", marginBottom: "2vh"}}
+      onChange={(event, value) => handleSearchValueChange(value)}
+    />
+    <div style={{display: "flex", margin: "auto", justifyContent: "center"}}>
+    {
+      resultsCard
+    }
     </div>
-    <HorizontalLegend />
+
+      <div className='page-header' style={{marginTop: "3vh"}}>
+        <h1>Rooms</h1>
+      </div>
+      
+      <div style={{display: "flex", flexDirection:"row"}}>
+        <div style={{marginLeft: "12vw"}}>
+          <Checkbox checked={availableCheckBox} color="success" onChange={() => setAvailableCheckBox(!availableCheckBox)}/>
+          <label>Available</label>
+
+          <Checkbox  checked={reservedCheckBox} color="warning" onChange={() => setReservedCheckBox(!reservedCheckBox)}/>
+          <label>Reserved</label>
+
+          <Checkbox checked={occupiedCheckBox}  color="error" onChange={() => setOccupiedCheckBox(!occupiedCheckBox)}/>
+          <label>Occupied</label>
+        </div>
+        <p style={{marginLeft: "15px", fontSize: "small"}}>*Reserved means that the room is booked but not in use</p>
+      </div>
+
       <CardGrid>
         {
           data.map((room, index) => {
-            if (room.status === "available") {
+            if (room.status === "available" && availableCheckBox 
+                || room.status === "occupied" && occupiedCheckBox 
+                || room.status === "booked" && reservedCheckBox) {
               return (
-                <RoomCard
+                <RoomCardAlt
                   key={room.room}
                   RoomName={room.room}
                   RoomHouse={room.building}
@@ -62,6 +134,7 @@ function ListRooms() {
           })
         }
       </CardGrid>
+      
     </>
   )
 }

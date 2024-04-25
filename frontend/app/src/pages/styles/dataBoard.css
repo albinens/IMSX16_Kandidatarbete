@@ -1,0 +1,42 @@
+.two-column-wrapper-dataBoard {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 6vh;
+}
+
+.left-column-dataBoard {
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.right-column-dataBoard {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.week-table-dataBoard {
+  width: 100%;
+  margin-top: 2vh;
+}
+
+.week-table-dataBoard tr {
+  background-color: #f2f2f2;
+}
+
+.week-table-dataBoard tr th {
+  background-color: #f2f2f2;
+  padding: 8px;
+  text-align: center;
+}
+
+.week-table-dataBoard tr td {
+  padding: 8px;
+  text-align: center;
+}

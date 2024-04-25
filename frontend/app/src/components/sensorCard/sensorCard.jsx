@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 import "./sensorCard.css";
+import DeleteIcon from "../../assets/delete.svg"
 
 /*
 Props: 
@@ -31,6 +33,30 @@ function SensorCard(props) {
     );
   }, [sensorStatus])
 
+  const removeSensorAlert = () => {
+    if (window.confirm("Are you sure you want to remove this sensor?")) {
+      removeSensor()
+    }
+  }
+
+  const removeSensor = () => {
+    let remStr = "/remove-room/" + props.RoomName
+    const client = axios.create({
+      baseURL: "http://localhost:8080/api",
+      headers: {
+        'X-API-KEY': 'super_secret_key'
+      }
+    })
+    client.delete(remStr, {})
+    .then((response) => {
+      console.log(response)
+      props.sensorDataSetter(...props.sensorData.filter((sensor) => sensor.room !== props.RoomName))
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+  }
+
   return (
     <div className="mobile-room-card-root">
       <div className="mobile-room-card-info-text">
@@ -49,6 +75,9 @@ function SensorCard(props) {
             backgroundColor: sensorStatusColor
           }} 
         />
+        <button onClick={() => removeSensorAlert()}>
+          <img src={DeleteIcon} alt="Delete Icon" />
+        </button>
       </div>
     </div>
   );

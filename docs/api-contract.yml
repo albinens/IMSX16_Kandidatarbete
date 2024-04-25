@@ -13,7 +13,7 @@ paths:
     get:
       summary: 'Gets a list of all rooms and their current availability.'
       tags:
-        - 'Room'
+        - 'Occupancy'
       responses:
         '200':
           description: 'A list of all rooms and their current availability.'
@@ -34,7 +34,7 @@ paths:
     get:
       summary: 'Gets the current availability of a specific room.'
       tags:
-        - 'Room'
+        - 'Occupancy'
       parameters:
         - name: 'room'
           in: 'path'
@@ -228,6 +228,83 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
+  /stats/raw-serial/{from}/{to}/{resolution}:
+    get:
+      summary: 'Get the raw serial data for rooms between two timestamps.'
+      tags:
+        - 'Statistics'
+      security:
+        - ApiKey: []
+      parameters:
+        - name: 'from'
+          in: 'path'
+          required: true
+          description: 'The start timestamp.'
+          schema:
+            type: 'integer'
+            format: 'int64'
+            example: 1614556800000
+        - name: 'to'
+          in: 'path'
+          required: true
+          description: 'The end timestamp.'
+          schema:
+            type: 'integer'
+            format: 'int64'
+            example: 1614643200000
+        - name: 'resolution'
+          in: 'path'
+          required: true
+          description: 'The resolution of the data points in time, such as 5m, 1h, 1d. Will be the sliding rolling average.'
+          schema:
+            type: 'string'
+            example: '5m'
+      responses:
+        '200':
+          description: 'The raw serial data for rooms between the two timestamps.'
+          content:
+            application/json:
+              schema:
+                type: 'array'
+                items:
+                  type: 'object'
+                  properties:
+                    roomName:
+                      type: 'string'
+                      description: 'The name of the room.'
+                      example: 'EG-2515'
+                    data:
+                      type: 'array'
+                      items:
+                        type: 'object'
+                        properties:
+                          timestamp:
+                            type: 'integer'
+                            format: 'int64'
+                            description: 'The timestamp of the data point.'
+                            example: 1614556800000
+                          occupancy:
+                            type: 'number'
+                            description: 'The occupancy of the room at the timestamp.'
+                            example: 3
+        '500':
+          description: 'Internal Server Error.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '400':
+          description: 'The timestamps are not a valid range.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: 'Unauthorized.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
 
   /auth/setup:
     post:
