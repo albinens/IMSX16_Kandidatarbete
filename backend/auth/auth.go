@@ -19,6 +19,16 @@ func CreateGatewayUser(ctx context.Context, username, password string) error {
 	return nil
 }
 
+func DeleteGatewayUser(ctx context.Context, username string) error {
+	_, err := database.GetDB().ExecContext(ctx, "DELETE FROM gateway_users WHERE username = $1", username)
+	if err != nil {
+		slog.ErrorContext(ctx, "Error while deleting gateway user: ", err)
+		return err
+	}
+
+	return nil
+}
+
 func CreateApiKey(ctx context.Context, key string) error {
 	_, err := database.GetDB().ExecContext(ctx, "INSERT INTO api_keys (key) VALUES ($1)", key)
 	if err != nil {

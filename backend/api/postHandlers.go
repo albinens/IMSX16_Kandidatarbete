@@ -14,6 +14,33 @@ import (
 	"example.com/m/v2/utils"
 )
 
+func createGatewayLogin(w http.ResponseWriter, r *http.Request) {
+	var login struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&login); err != nil {
+		utils.WriteHttpError(w, "Request body is malformed", http.StatusBadRequest)
+		slog.DebugContext(r.Context(), "Failed to decode request body", "error", err)
+		return
+	}
+
+	if login.Username == "" || login.Password == "" {
+		utils.WriteHttpError(w, "No fields can be empty", http.StatusBadRequest)
+		slog.DebugContext(r.Context(), "Empty fields sent to create gateway login", "login", login)
+		return
+	}
+
+	if err := auth.CreateGatewayUser(r.Context(), login.Username, login.Password); err != nil {
+		utils.WriteHttpError(w, "Internal server error", http.StatusInternalServerError)
+		slog.ErrorContext(r.Context(), "Failed to create gateway login", "error", err)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+}
+
 func createKey(w http.ResponseWriter, r *http.Request) {
 	var key struct {
 		Key string `json:"key"`
