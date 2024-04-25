@@ -46,3 +46,21 @@ func WriteHttpError(w http.ResponseWriter, message string, statusCode int) {
 		slog.Error("Failed to write error response: ", err)
 	}
 }
+
+func IsInList[T comparable](list []T, item T) bool {
+	for _, listItem := range list {
+		if listItem == item {
+			return true
+		}
+	}
+	return false
+}
+
+func IsInListFunc[T any](list []T, f func(T) bool) bool {
+	for _, listItem := range list {
+		if f(listItem) {
+			return true
+		}
+	}
+	return false
+}

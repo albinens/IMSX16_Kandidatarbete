@@ -17,6 +17,13 @@ func (l *RequestLoggerMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Reque
 	ctx = context.WithValue(ctx, TraceCtxKey, traceID)
 	r = r.WithContext(ctx)
 
+	// Skip logging for the status endpoint
+	// As that would be too much noise
+	if r.URL.Path == "/api/status" {
+		l.handler.ServeHTTP(w, r)
+		return
+	}
+
 	slog.InfoContext(ctx, "Request started", "method", r.Method, "path", r.URL.Path)
 	start := time.Now()
 	l.handler.ServeHTTP(w, r)

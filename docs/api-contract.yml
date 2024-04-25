@@ -136,41 +136,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
 
-  /report/status:
-    post:
-      summary: 'Report the amount of people in a room currently.'
-      tags:
-        - 'Report'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: 'integer'
-              description: 'The amount of people in the room.'
-              example: 5
-      responses:
-        '200':
-          description: 'The status was successfully reported.'
-        '500':
-          description: 'Internal Server Error.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InternalServerError'
-        '401':
-          description: 'If the mac-address of the sensor is not registered.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedError'
-        '400':
-          description: 'Request not formatted correctly.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BadRequestError'
-
   /stats/daily-average/{from}/{to}:
     get:
       summary: 'Get the weekday average occupancy for rooms between two timestamps.'

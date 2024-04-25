@@ -80,6 +80,17 @@ func rawSerialData(w http.ResponseWriter, r *http.Request) {
 	sendJSONResponse(w, r, response)
 }
 
+func allRooms(w http.ResponseWriter, r *http.Request) {
+	rooms, err := room.AllRooms()
+	if err != nil {
+		utils.WriteHttpError(w, "Internal server error", http.StatusInternalServerError)
+		slog.ErrorContext(r.Context(), "Failed to get all rooms", "error", err)
+		return
+	}
+
+	sendJSONResponse(w, r, rooms)
+}
+
 func dailyAverage(w http.ResponseWriter, r *http.Request) {
 	from := r.PathValue("from")
 	to := r.PathValue("to")

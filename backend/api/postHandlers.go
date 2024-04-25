@@ -6,9 +6,37 @@ import (
 	"net/http"
 	"strings"
 
+	g1gateway "example.com/m/v2/api/g1_gateway"
 	"example.com/m/v2/room"
+	"example.com/m/v2/sensor"
 	"example.com/m/v2/utils"
 )
+
+func status(w http.ResponseWriter, r *http.Request) {
+	data, err := g1gateway.ParseStatus(w, r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	for _, statusData := range data {
+		statusRoom, err := sensor.RoomFromMac(statusData.MacAdress)
+		if err != nil {
+			utils.WriteHttpError(w, "Internal server error", http.StatusInternalServerError)
+			slog.ErrorContext(r.Context(), "Failed to get room from mac", "error", err)
+			return
+		}
+
+		if statusRoom == "" {
+			slog.WarnContext(r.Context(), "Room not found", "room", statusData.MacAdress)
+			continue
+		}
+
+		room.AddStatus(statusRoom, statusData.NrOfPeople)
+	}
+
+	w.WriteHeader(http.StatusCreated)
+}
 
 func addRoom(w http.ResponseWriter, r *http.Request) {
 	var roomToAdd struct {

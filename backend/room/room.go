@@ -8,6 +8,7 @@ import (
 
 	"example.com/m/v2/database"
 	"example.com/m/v2/utils"
+	"example.com/m/v2/sensor"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
@@ -89,6 +90,11 @@ func RoomByName(name string) (*RoomDBObject, error) {
 	return &room, nil
 }
 
+func AddStatus(room string, numberOfPeople int64) {
+	dataPoint := CreateDataPoint(room, numberOfPeople, time.Now())
+	database.WriteTimeSeriesData(dataPoint)
+}
+
 func CreateDataPoint(room string, numberOfPeople int64, time time.Time) *write.Point {
 	p := influxdb2.NewPointWithMeasurement("status").AddTag("room", room).
 		AddField("number_of_people", numberOfPeople).
@@ -96,18 +102,30 @@ func CreateDataPoint(room string, numberOfPeople int64, time time.Time) *write.P
 	return p
 }
 
-func AddRoom(name, sensor, building string) error {
+func AddRoom(name, mac, building string) error {
 	db := database.GetDB()
 
-	_, err := db.Queryx("INSERT INTO rooms (name, sensor, building) VALUES ($1, $2, $3)", name, sensor, building)
-	return err
+	_, err := db.Exec("INSERT INTO rooms (name, sensor, building) VALUES ($1, $2, $3)", name, mac, building)
+	if err != nil {
+		return errors.Wrap(err, "failed to insert room into database")
+	}
+
+	sensor.Update()
+
+	return nil
 }
 
 func DeleteRoom(name string) error {
 	db := database.GetDB()
 
-	_, err := db.Queryx("DELETE FROM rooms WHERE name = $1", name)
-	return err
+	_, err := db.Exec("DELETE FROM rooms WHERE name = $1", name)
+	if err != nil {
+		return errors.Wrap(err, "failed to delete room from database")
+	}
+
+	sensor.Update()
+
+	return nil
 }
 
 func StatusOfRoom(name string) (*Room, error) {
