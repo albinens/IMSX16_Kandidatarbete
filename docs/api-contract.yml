@@ -228,6 +228,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
+
   /stats/raw-serial/{from}/{to}/{resolution}:
     get:
       summary: 'Get the raw serial data for rooms between two timestamps.'
@@ -602,7 +603,7 @@ components:
           type: 'string'
           description: 'The building the room is located in.'
           example: 'NC'
-        mac-address:
+        sensor:
           type: 'string'
           description: 'The MAC address of the sensor in the room.'
           example: '00:00:00:00:00:00'
