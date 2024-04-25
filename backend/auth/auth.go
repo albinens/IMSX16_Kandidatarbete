@@ -29,6 +29,16 @@ func CreateApiKey(ctx context.Context, key string) error {
 	return nil
 }
 
+func DeleteApiKey(ctx context.Context, key string) error {
+	_, err := database.GetDB().ExecContext(ctx, "DELETE FROM api_keys WHERE key = $1", key)
+	if err != nil {
+		slog.ErrorContext(ctx, "Error while deleting API key: ", err)
+		return err
+	}
+
+	return nil
+}
+
 func VerifyGatewayUserMiddlewareFunc(handler func(w http.ResponseWriter, r *http.Request)) http.Handler {
 	return VerifyGatewayUserMiddlewareHandler(http.HandlerFunc(handler))
 }
