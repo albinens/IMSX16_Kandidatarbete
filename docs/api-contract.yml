@@ -29,6 +29,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
+
   /current/{room}:
     get:
       summary: 'Gets the current availability of a specific room.'
@@ -294,6 +295,211 @@ paths:
                 $ref: '#/components/schemas/InternalServerError'
         '400':
           description: 'The timestamps are not a valid range.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: 'Unauthorized.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+
+  /auth/setup:
+    post:
+      summary: 'Sets up the initial API key for the system. This is only allowed once.'
+      tags:
+        - 'Auth'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: 'object'
+              properties:
+                verification_key:
+                  type: 'string'
+                  description: 'The verification key to set up the API key.'
+                  example: '123456'
+                new_key:
+                  type: 'string'
+                  description: 'The new API key to set up.'
+                  example: '123456'
+      responses:
+        '200':
+          description: 'The API key was successfully set up.'
+        '500':
+          description: 'Internal Server Error.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '400':
+          description: 'Request not formatted correctly.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: 'Unauthorized. The verification key is incorrect.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+
+  /auth/key/create:
+    post:
+      summary: 'Creates a new API key.'
+      tags:
+        - 'Auth'
+      security:
+        - ApiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: 'object'
+              properties:
+                key:
+                  type: 'string'
+                  description: 'The new API key to create.'
+                  example: '123456'
+      responses:
+        '201':
+          description: 'The API key was successfully created.'
+        '500':
+          description: 'Internal Server Error.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '400':
+          description: 'Request not formatted correctly.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: 'Unauthorized.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+
+  /auth/key/revoke:
+    delete:
+      summary: 'Revokes an API key.'
+      tags:
+        - 'Auth'
+      security:
+        - ApiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: 'object'
+              properties:
+                key:
+                  type: 'string'
+                  description: 'The API key to revoke.'
+                  example: '123456'
+      responses:
+        '200':
+          description: 'The API key was successfully revoked.'
+        '500':
+          description: 'Internal Server Error.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '400':
+          description: 'Request not formatted correctly.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: 'Unauthorized.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+
+  /auth/gateway/create:
+    post:
+      summary: 'Creates a user and password that a gateway can use to authenticate.'
+      tags:
+        - 'Auth'
+      security:
+        - ApiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: 'object'
+              properties:
+                username:
+                  type: 'string'
+                  description: 'The username used to authenticate.'
+                  example: 'NC'
+                password:
+                  type: 'string'
+                  description: 'The password for the the given user.'
+      responses:
+        '201':
+          description: 'The user was successfully created.'
+        '500':
+          description: 'Internal Server Error.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '400':
+          description: 'Request not formatted correctly.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: 'Unauthorized.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+
+  /auth/gateway/remove:
+    delete:
+      summary: 'Removes a user that a gateway can use to authenticate.'
+      tags:
+        - 'Auth'
+      security:
+        - ApiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: 'object'
+              properties:
+                username:
+                  type: 'string'
+                  description: 'The username to remove.'
+                  example: 'NC'
+      responses:
+        '200':
+          description: 'The user was successfully removed.'
+        '500':
+          description: 'Internal Server Error.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '400':
+          description: 'Request not formatted correctly.'
           content:
             application/json:
               schema:

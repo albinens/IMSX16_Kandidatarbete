@@ -7,6 +7,7 @@ import (
 )
 
 var Port string
+var InitialAuthKey string
 
 var InfluxDB struct {
 	Token  string
@@ -30,6 +31,7 @@ func Load() {
 	loadPostgres()
 	loadInfluxDB()
 	Port = withDefault("PORT", "8080")
+	InitialAuthKey = withDefault("INITIAL_AUTH_KEY", "123456")
 }
 
 func loadPostgres() {

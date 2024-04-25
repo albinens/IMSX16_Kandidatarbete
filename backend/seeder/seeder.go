@@ -52,6 +52,10 @@ func populateSQL() error {
 		return err
 	}
 
+	if err := addGatewayUsers(tx); err != nil {
+		return err
+	}
+
 	if err = tx.Commit(); err != nil {
 		return err
 	}
@@ -95,6 +99,10 @@ func addRooms(tx *sql.Tx) error {
 	return nil
 }
 
+func addGatewayUsers(tx *sql.Tx) error {
+	return addGatewayUser(tx, "test", "test")
+}
+
 func addRoom(tx *sql.Tx, name, sensor, building string) error {
 	_, err := tx.Exec("INSERT INTO rooms (name, sensor, building) VALUES ($1, $2, $3)", name, sensor, building)
 	if err != nil {
@@ -106,6 +114,15 @@ func addRoom(tx *sql.Tx, name, sensor, building string) error {
 
 func addApiKeys(tx *sql.Tx) error {
 	_, err := tx.Exec("INSERT INTO api_keys (key) VALUES ('super_secret_key')")
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	return nil
+}
+
+func addGatewayUser(tx *sql.Tx, username, password string) error {
+	_, err := tx.Exec("INSERT INTO gateway_users (username, password) VALUES ($1, $2)", username, password)
 	if err != nil {
 		tx.Rollback()
 		return err
