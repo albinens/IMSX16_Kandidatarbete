@@ -84,7 +84,7 @@ const ChartContainer = (props) => {
 
   let chartOptions = {
     title: props.chartHeader,
-    hAxis: { title: "Time", format: "dd-MM-yyyy"},
+    hAxis: { title: "Time", format: "dd-MM-yyyy HH:mm"},
     vAxis: { title: "Recorded People", viewWindow: { min: 0, max: 10 } },
     legend: "none",
     ticks: dateTicks
