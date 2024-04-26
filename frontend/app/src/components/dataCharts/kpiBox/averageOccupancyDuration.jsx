@@ -9,7 +9,28 @@ const AverageOccupancyDuration = (props) => {
   const [value, setValue] = useState(0)
 
   const treatData = () => {
+    let tempData = []
+    let occupancySpans = []
 
+    props.data.map((obj) => {
+      tempData.push({
+        name: obj.roomName,
+        data: obj.data
+      })
+    })
+    console.log('Temp data', tempData)
+    tempData.map((room) => {
+      let current = 0
+      room.data.map((row) => {
+        if(row.occupancy > 0){
+          current += 5
+        } else if (current > 0){
+          occupancySpans.push(current)
+        }
+      })
+    })
+    setValue((occupancySpans.reduce((a, b) => a + b, 0) / occupancySpans.length).toFixed(0))
+    console.log('Occupancy spans', occupancySpans)
   }
 
 
@@ -23,7 +44,7 @@ const AverageOccupancyDuration = (props) => {
     <KpiBox 
       title="Average Occupancy Duration"
       value={value} 
-      unit="hh:mm"
+      unit="minutes"
     />
   )
 }

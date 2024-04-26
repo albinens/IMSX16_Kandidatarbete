@@ -10,7 +10,7 @@ function Sensors() {
 
   const API_KEY = import.meta.env.API_KEY
 
-  const [authenticated, setAuthenticated] = useState(false)
+  const [authenticated, setAuthenticated] = useState(localStorage.getItem("authed") === 'true' ? true : false)
   const authCode = 'super_secret_key'
 
   const [sensorAlreadyRegistered, setSensorAlreadyRegistered] = useState(false)
@@ -22,7 +22,7 @@ function Sensors() {
   const [sensorData, setSensorData] = useState([])
   const [recordedSensorNames, setRecordedSensorNames] = useState([])
   const client = axios.create({
-    baseURL: "http://localhost:8080/api",
+    baseURL: "/api",
     headers: {
       'X-API-KEY': 'super_secret_key'
     }
@@ -77,6 +77,9 @@ function Sensors() {
       <h2>Not Authenticated</h2> 
       <input type='password' placeholder='Enter password' onChange={(e) => {
         if(e.target.value === authCode){
+          localStorage.setItem("auth", authCode);
+          localStorage.setItem("authTime", Date.now());
+          localStorage.setItem("authed", true)
           setAuthenticated(true)
         }
       }} 

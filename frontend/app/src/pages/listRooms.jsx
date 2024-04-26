@@ -42,7 +42,7 @@ function ListRooms() {
   }
 
   const client = axios.create({
-    baseURL: "http://localhost:8080/api",
+    baseURL: "/api",
   })
 
   useEffect(() => {

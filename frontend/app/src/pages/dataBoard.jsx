@@ -12,13 +12,16 @@ const DataBoard = () => {
   const [isLoading, setIsLoading] = React.useState(true)
   const [datasetTable, setDatasetTable] = React.useState(undefined)
 
-  const [authenticated, setAuthenticated] = React.useState(false)
+  const [authenticated, setAuthenticated] = React.useState(localStorage.getItem("authed") === 'true' ? true : false)
   const authCode = 'super_secret_key'
+
+  const unixTimeNow = Math.floor(Date.now() / 1000)
+  const unixTimeWeekAgo = unixTimeNow - 604800
 
   const client = axios.create({
     baseURL: "/api",
     headers: {
-      'X-API-KEY': 'super_secret_key'
+      'X-API-KEY': '7xD9MFMRT8WstAYhrP88pEGd9kpRHq69'
     }
   })
 
@@ -26,7 +29,7 @@ const DataBoard = () => {
   const [datasetGraph, setDatasetGraph] = React.useState([])
   useMemo(() => {
     const fetchDataGraph = async () => {
-      let route = `/stats/raw-serial/1712860378/1713860378/1h`
+      let route = `/stats/raw-serial/${unixTimeWeekAgo}/${unixTimeNow}/1h`
       client.get(route)
       .then((response) => {
         setDatasetGraph(response.data)
@@ -45,7 +48,7 @@ const DataBoard = () => {
   const [datasetGraph2, setDatasetGraph2] = React.useState([])
   useMemo(() => {
     const fetchDataGraph2 = async () => {
-      let route = `/stats/raw-serial/1712860378/1713860378/1d`
+      let route = `/stats/raw-serial/${unixTimeWeekAgo}/${unixTimeNow}/1d`
       client.get(route)
       .then((response) => {
         setDatasetGraph2(response.data)
@@ -60,12 +63,11 @@ const DataBoard = () => {
     console.log('Data loaded dataBoard.jsx', datasetGraph2)
   },[isLoading, authenticated])
 
-
   //Table data load (left column)
   useEffect(() => {
     setIsLoading(true)
     const fetchDataTable = async () => {
-      client.get('/stats/daily-average/1614556800000/1614643200000')
+      client.get(`/stats/daily-average/${unixTimeWeekAgo}/${unixTimeNow}`)
       .then((response) => {
         let data = response.data
         //Sort based on name
@@ -92,6 +94,9 @@ const DataBoard = () => {
           <h2>Not Authenticated</h2> 
           <input type='password' placeholder='Enter password' onChange={(e) => {
             if(e.target.value === authCode){
+              localStorage.setItem("auth", authCode);
+              localStorage.setItem("authTime", Date.now());
+              localStorage.setItem("authed", true)
               setAuthenticated(true)
             }
           }} 
@@ -112,7 +117,7 @@ const DataBoard = () => {
           }}>
             <AverageOccupancyRate title='Total Occupancy' data={datasetGraph2} />
             <PeakOccupancyTime title='Peak Occupancy Time' data={datasetGraph} />
-            <AverageOccupancyDuration title='Average Occupancy Duration' data={datasetTable} />
+            <AverageOccupancyDuration title='Average Occupancy Duration' data={datasetGraph} />
           </div>
           <table className='week-table-dataBoard'>
             <thead>
