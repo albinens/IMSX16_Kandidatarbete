@@ -12,6 +12,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
+          <Route path="/" element={<ListRooms />}/>
           <Route path="listRooms" element={<ListRooms />}/>
           <Route path="settings" element={<Settings />}/>
           <Route path='sensors' element={<Sensors />}/>
