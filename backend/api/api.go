@@ -14,8 +14,22 @@ import (
 func Init() {
 	mux := http.NewServeMux()
 
-	apiDocs := http.StripPrefix("/api", http.FileServer(http.Dir("../docs")))
-	mux.Handle("GET /", apiDocs)
+	// apiDocs := http.StripPrefix("/api", http.FileServer(http.Dir("../docs")))
+	// mux.Handle("GET /api", apiDocs)
+
+	frontend := http.StripPrefix("/", http.FileServer(http.Dir("./public")))
+	listRooms := http.StripPrefix("/listRooms", http.FileServer(http.Dir("./public")))
+	listrooms := http.StripPrefix("/listrooms", http.FileServer(http.Dir("./public")))
+	dataBoard := http.StripPrefix("/dataBoard", http.FileServer(http.Dir("./public")))
+	sensors := http.StripPrefix("/sensors", http.FileServer(http.Dir("./public")))
+	about := http.StripPrefix("/about", http.FileServer(http.Dir("./public")))
+
+	mux.Handle("GET /", frontend)
+	mux.Handle("GET /listRooms", listRooms)
+	mux.Handle("GET /listrooms", listrooms)
+	mux.Handle("GET /dataBoard", dataBoard)
+	mux.Handle("GET /sensors", sensors)
+	mux.Handle("GET /about", about)
 
 	mux.HandleFunc("GET /api/current", currentStatus)
 	mux.HandleFunc("GET /api/current/{room}", roomStatus)
