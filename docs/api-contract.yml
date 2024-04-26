@@ -578,7 +578,8 @@ components:
         - 'available'
         - 'occupied'
         - 'booked'
-      description: 'The status of the room. Can be "available", "occupied" or "booked".'
+        - 'unknown'
+      description: 'The status of the room. Can be "available", "occupied", "booked" or "unknown". If the status is "unknown", no updates have been received from the sensor for a while.'
     Room:
       type: 'object'
       properties:
