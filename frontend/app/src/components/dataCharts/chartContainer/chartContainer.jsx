@@ -1,6 +1,6 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useState} from "react";
 import { Chart } from 'react-google-charts';
-import Legend from "../weekChart/legend";
+import Legend from "../legend/legend";
 
 
 /**
@@ -19,21 +19,14 @@ import Legend from "../weekChart/legend";
  */
 const ChartContainer = (props) => {
 
-  const chartOptions = {
-    title: "Recorded People in a Room",
-    hAxis: { title: "Time", viewWindow: { min: 1712860378, max: 1713860378 } },
-    vAxis: { title: "Recorded People", viewWindow: { min: 0, max: 15 } },
-    legend: "none"
-  };
-
-
   const [dataSeries, setDataSeries] = useState(props.dataSeries);
   const [chartData, setChartData] = useState([]);
   const [noChart, setNoChart] = useState(true);
   const [selectedItems, setSelectedItems] = useState([]);
+  const [dateTicks, setDateTicks] = useState([])
 
 
-  useEffect(() => {
+  const proccessGraphData = () => {
     let tempDataSeries = [];
     let counter = 0;
     const colors = 
@@ -54,25 +47,31 @@ const ChartContainer = (props) => {
     setDataSeries(tempDataSeries);
     console.log('Data series', dataSeries)
 
+    let lowestDate = 999999999;
     let filteredData = dataSeries.filter((room) => selectedItems.includes(room.name))
     .map((room) => {
       return room.items.map((row) => {
-        return [row.timestamp, row.occupancy]
+        let date = new Date(row.timestamp* 1000)
+        if(row.timestamp < lowestDate) lowestDate = row.timestamp
+        return [date, row.occupancy, room.color]
       })
     })
-
+    for(let i = 0; i < 2; i++){
+      setDateTicks([ ...dateTicks, dateTicks.push(new Date((lowestDate + (i * 86400)) * 1000))])
+    }
     let destructedArray = []
     filteredData.map(array => destructedArray.push(...array))
 
     setChartData([
-      ["Time", "Number of People"],
-      [0, 0],
-      ...destructedArray
+      ["Time", "Number of People", { role: "style" }],
+      ...destructedArray || [0,0,0]
     ])
-    console.log('Chart data', chartData)
+  }
 
+  useEffect(() => {
+    proccessGraphData();
     setNoChart(chartData.length === 0);
-  }, [selectedItems]);
+  }, [selectedItems, props.dataSeries]);
 
   const legendData = dataSeries;
 
@@ -83,30 +82,43 @@ const ChartContainer = (props) => {
     setSelectedItems(newSelectedItems);
   };
 
+  let chartOptions = {
+    title: "1 Week Overlook",
+    hAxis: { title: "Time", format: "dd-MM-yyyy"},
+    vAxis: { title: "Recorded People", viewWindow: { min: 0, max: 10 } },
+    legend: "none",
+    ticks: dateTicks
+  };
+
   return (
-    <div className="chart-container">
+    <div className="chart-container" style={{width: "90%"}}>
 
       {
         noChart ? <h1>No Data to Display</h1> :
         <>
           <Legend 
-          data={legendData} 
-          onChange={onChangeSelection} 
-          selectedItems={selectedItems}
-        />
-          <Chart
-            width={'700px'}
-            height={'400px'}
-            chartType="LineChart"
-            data={chartData}
-            options={chartOptions}
-            graphID="LineChart"
+            data={legendData} 
+            onChange={onChangeSelection} 
+            selectedItems={selectedItems}
+            style={{left: "0px", top: "0px"}}
           />
+            <div style={{height: "400px"}}>
+            {
+              selectedItems.length === 0 && 
+              <h2>Select a room to display</h2> ||
+              <Chart
+              width={'100%'}
+              height={'100%'}
+              chartType="ColumnChart"
+              data={chartData}
+              options={chartOptions}
+              graphID="LineChart"
+            />
+            }
+            </div>
+
         </>
       }
-
-      <div className="chart">
-      </div>
     </div>
   );
 }

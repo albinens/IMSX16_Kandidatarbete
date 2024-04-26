@@ -10,6 +10,9 @@ const DataBoard = () => {
   const [datasetGraph, setDatasetGraph] = React.useState([])
   const [datasetTable, setDatasetTable] = React.useState(undefined)
 
+  const [authenticated, setAuthenticated] = React.useState(false)
+  const authCode = 'super_secret_key'
+
   const client = axios.create({
     baseURL: "http://localhost:8080/api",
     headers: {
@@ -29,9 +32,11 @@ const DataBoard = () => {
         console.log(`Error fetching data ${err}`)
       })
     }
-    fetchDataGraph()
+    if(authenticated){
+      fetchDataGraph()
+    }
     console.log('Data loaded dataBoard.jsx', datasetGraph)
-  },[isLoading])
+  },[isLoading, authenticated])
 
   //Table data load (left column)
   useEffect(() => {
@@ -48,14 +53,29 @@ const DataBoard = () => {
         console.log(`Error fetching data ${err}`)
       })
     }
-    fetchDataTable()
-  }, [])
+    if(authenticated){
+      fetchDataTable()
+    }
+  }, [authenticated])
 
 
 
 
   return (
     <>
+    {
+      //Very simple authentication to protect everything
+      !authenticated ? 
+        <div className='page-header'> 
+          <h2>Not Authenticated</h2> 
+          <input type='password' placeholder='Enter password' onChange={(e) => {
+            if(e.target.value === authCode){
+              setAuthenticated(true)
+            }
+          }} 
+          />
+        </div> : 
+      <>
       <div className='page-header'>
         <h1>Data Insights</h1>
       </div>
@@ -94,12 +114,13 @@ const DataBoard = () => {
         </div>
         {/* RIGHT COLUMN */ }
         <div className='right-column-dataBoard'>
+          <h2>Graphs</h2>
           <ChartContainer dataSeries={datasetGraph}/>
-
         </div>
       </div>
+      </>
+    }
     </>
-
   );
 }
 
