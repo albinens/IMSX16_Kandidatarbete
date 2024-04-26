@@ -14,8 +14,9 @@ import (
 func Init() {
 	mux := http.NewServeMux()
 
-	// apiDocs := http.StripPrefix("/api", http.FileServer(http.Dir("../docs")))
-	// mux.Handle("GET /api", apiDocs)
+	apiDocs := http.FileServer(http.Dir("../docs"))
+	mux.Handle("GET /api/", http.StripPrefix("/api/", apiDocs))
+	mux.Handle("GET /api", http.StripPrefix("/api", apiDocs))
 
 	frontend := http.StripPrefix("/", http.FileServer(http.Dir("./public")))
 	listRooms := http.StripPrefix("/listRooms", http.FileServer(http.Dir("./public")))
