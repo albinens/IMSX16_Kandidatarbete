@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"example.com/m/v2/database"
-	"example.com/m/v2/utils"
 	"example.com/m/v2/sensor"
+	"example.com/m/v2/utils"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
@@ -21,6 +21,7 @@ const (
 	Available Status = "available"
 	Occupied  Status = "occupied"
 	Booked    Status = "booked"
+	Unknown   Status = "unknown"
 )
 
 type Room struct {
@@ -49,13 +50,7 @@ func StatusOfAllRooms() ([]Room, error) {
 	roomsWithOccupancy := make([]Room, 0, len(rooms))
 
 	for _, room := range rooms {
-		var status Status
-		if currentOccupation[room.Name] == 0 {
-			status = Available
-		} else {
-			status = Occupied
-		}
-
+		status := occupationToStatus(currentOccupation[room.Name])
 		roomsWithOccupancy = append(roomsWithOccupancy, Room{
 			Room:     room.Name,
 			Building: room.Building,
@@ -285,7 +280,12 @@ func toWeekdayAverage(data map[string]map[string]*roomOccupancyWithEntries) *Wee
 	return &total
 }
 
-func currentRoomOccupancy() (map[string]int64, error) {
+type Occupancy struct {
+	People     int64
+	LastReport time.Time
+}
+
+func currentRoomOccupancy() (map[string]Occupancy, error) {
 	reader := database.TimeSeriesReader()
 	query := `
 		from(bucket: "liveinfo")
@@ -299,17 +299,24 @@ func currentRoomOccupancy() (map[string]int64, error) {
 		return nil, errors.Wrap(err, "failed to query influxdb for current room occupancy")
 	}
 
-	currentOccupation := make(map[string]int64)
+	currentOccupation := make(map[string]Occupancy)
 
 	for result.Next() {
-		currentOccupation[result.Record().ValueByKey("room").(string)] = result.Record().Value().(int64)
+		currentOccupation[result.Record().ValueByKey("room").(string)] = Occupancy{
+			People:     result.Record().Value().(int64),
+			LastReport: result.Record().Time(),
+		}
 	}
 
 	return currentOccupation, nil
 }
 
-func occupationToStatus(occupation int64) Status {
-	if occupation == 0 {
+func occupationToStatus(occupation Occupancy) Status {
+	if time.Since(occupation.LastReport) > 10*time.Minute {
+		return Unknown
+	}
+
+	if occupation.People == 0 {
 		return Available
 	}
 	return Occupied
