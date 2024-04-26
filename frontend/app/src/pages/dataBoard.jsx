@@ -3,27 +3,30 @@ import axios from 'axios'
 import './styles/dataBoard.css';
 
 import ChartContainer from '../components/dataCharts/chartContainer/chartContainer'
+import AverageOccupancyRate from '../components/dataCharts/kpiBox/averageOccupancyRate';
+import PeakOccupancyTime from '../components/dataCharts/kpiBox/peakOccupancyTime';
+import AverageOccupancyDuration from '../components/dataCharts/kpiBox/averageOccupancyDuration';
 
 const DataBoard = () => {
 
   const [isLoading, setIsLoading] = React.useState(true)
-  const [datasetGraph, setDatasetGraph] = React.useState([])
   const [datasetTable, setDatasetTable] = React.useState(undefined)
 
   const [authenticated, setAuthenticated] = React.useState(false)
   const authCode = 'super_secret_key'
 
   const client = axios.create({
-    baseURL: "http://localhost:8080/api",
+    baseURL: "/api",
     headers: {
       'X-API-KEY': 'super_secret_key'
     }
   })
 
-  //Graph data load (right column)
+  //Graph 1 data load (right column)
+  const [datasetGraph, setDatasetGraph] = React.useState([])
   useMemo(() => {
     const fetchDataGraph = async () => {
-      let route = `/stats/raw-serial/1712860378/1713860378/5m`
+      let route = `/stats/raw-serial/1712860378/1713860378/1h`
       client.get(route)
       .then((response) => {
         setDatasetGraph(response.data)
@@ -37,6 +40,26 @@ const DataBoard = () => {
     }
     console.log('Data loaded dataBoard.jsx', datasetGraph)
   },[isLoading, authenticated])
+
+  //Graph 2 data load (right column)
+  const [datasetGraph2, setDatasetGraph2] = React.useState([])
+  useMemo(() => {
+    const fetchDataGraph2 = async () => {
+      let route = `/stats/raw-serial/1712860378/1713860378/1d`
+      client.get(route)
+      .then((response) => {
+        setDatasetGraph2(response.data)
+        setIsLoading(false)
+      }).catch((err) => {
+        console.log(`Error fetching data ${err}`)
+      })
+    }
+    if(authenticated){
+      fetchDataGraph2()
+    }
+    console.log('Data loaded dataBoard.jsx', datasetGraph2)
+  },[isLoading, authenticated])
+
 
   //Table data load (left column)
   useEffect(() => {
@@ -59,12 +82,11 @@ const DataBoard = () => {
   }, [authenticated])
 
 
-
-
   return (
     <>
     {
       //Very simple authentication to protect everything
+      //Data resolution
       !authenticated ? 
         <div className='page-header'> 
           <h2>Not Authenticated</h2> 
@@ -82,6 +104,16 @@ const DataBoard = () => {
       <div className='two-column-wrapper-dataBoard'>
         {/* LEFT COLUMN */ }
         <div className='left-column-dataBoard'>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginBottom: '20px'
+          }}>
+            <AverageOccupancyRate title='Total Occupancy' data={datasetGraph2} />
+            <PeakOccupancyTime title='Peak Occupancy Time' data={datasetGraph} />
+            <AverageOccupancyDuration title='Average Occupancy Duration' data={datasetTable} />
+          </div>
           <table className='week-table-dataBoard'>
             <thead>
               <tr>
@@ -115,7 +147,16 @@ const DataBoard = () => {
         {/* RIGHT COLUMN */ }
         <div className='right-column-dataBoard'>
           <h2>Graphs</h2>
-          <ChartContainer dataSeries={datasetGraph}/>
+          <ChartContainer 
+            dataSeries={datasetGraph} 
+            chartHeader={"1 week overlook by hour"}
+            chartID={"chart1"}
+          />
+          <ChartContainer 
+            dataSeries={datasetGraph2} 
+            chartHeader={"1 week overlook by daily average"}
+            chartID={"chart2"}
+          />
         </div>
       </div>
       </>
