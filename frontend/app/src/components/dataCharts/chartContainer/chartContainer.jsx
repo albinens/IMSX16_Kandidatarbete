@@ -83,7 +83,7 @@ const ChartContainer = (props) => {
   };
 
   let chartOptions = {
-    title: "1 Week Overlook",
+    title: props.chartHeader,
     hAxis: { title: "Time", format: "dd-MM-yyyy"},
     vAxis: { title: "Recorded People", viewWindow: { min: 0, max: 10 } },
     legend: "none",
@@ -112,7 +112,7 @@ const ChartContainer = (props) => {
               chartType="ColumnChart"
               data={chartData}
               options={chartOptions}
-              graphID="LineChart"
+              graphID={props.chartID}
             />
             }
             </div>
