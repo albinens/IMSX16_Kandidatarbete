@@ -13,8 +13,8 @@ function ListRooms() {
 
   //Checkbox states
   const [availableCheckBox, setAvailableCheckBox] = useState(true)
-  const [unknownCheckBox, setUnknownCheckBox] = useState(true)
   const [occupiedCheckBox, setOccupiedCheckBox] = useState(true)
+  const [unknownCheckBox, setUnknownCheckBox] = useState(true)
 
 
 
@@ -77,9 +77,9 @@ function ListRooms() {
 
       <CardGrid>
         {
-          data.map((room, index) => {
+          data.map((room) => {
             if (room.status === "available" && availableCheckBox 
-                || room.status === "reserved" && occupiedCheckBox 
+                || room.status === "occupied" && occupiedCheckBox 
                 || room.status === "unknown" && unknownCheckBox) {
               return (
                 <RoomCardAlt

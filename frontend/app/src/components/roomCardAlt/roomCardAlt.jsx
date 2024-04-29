@@ -7,7 +7,7 @@ import "./roomCard.css";
 /* Props: 
  - RoomName
  - RoomHouse
- - Avaiability (Available, Booked, Occupied)
+ - Avaiability (Available, Booked, Booked)
  */
 export default function RoomCardAlt(props) {
 
@@ -21,6 +21,7 @@ export default function RoomCardAlt(props) {
       : props.Avaiability === "unknown"
       ? gray
       : red
+      //Lägg till unknown
   );
 
   useEffect(() => {

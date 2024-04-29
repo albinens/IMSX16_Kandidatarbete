@@ -30,7 +30,7 @@ const DataBoard = () => {
   const [datasetGraph, setDatasetGraph] = React.useState([])
   useMemo(() => {
     const fetchDataGraph = async () => {
-      let route = `/stats/raw-serial/${unixTimeWeekAgo}/${unixTimeNow}/1h`
+      let route = `/stats/raw-serial/${unixTimeWeekAgo}/${unixTimeNow}/1m`
       client.get(route)
       .then((response) => {
         setDatasetGraph(response.data)
