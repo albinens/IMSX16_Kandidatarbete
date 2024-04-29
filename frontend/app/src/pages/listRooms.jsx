@@ -6,9 +6,6 @@ import { Autocomplete, Checkbox, TextField } from '@mui/material'
 
 function ListRooms() {
 
-  //const API_URL = import.meta.env.API_URL
-  //const API_KEY = import.meta.env.API_KEY
-
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   
   const [data, setData] = useState([])
@@ -16,30 +13,10 @@ function ListRooms() {
 
   //Checkbox states
   const [availableCheckBox, setAvailableCheckBox] = useState(true)
-  const [reservedCheckBox, setReservedCheckBox] = useState(false)
-  const [occupiedCheckBox, setOccupiedCheckBox] = useState(false)
+  const [reservedCheckBox, setReservedCheckBox] = useState(true)
+  const [occupiedCheckBox, setOccupiedCheckBox] = useState(true)
 
-  //Search bar state
-  const [searchValue, setSearchValue] = useState("")
-  const [resultsCard, setResultsCard] = useState(undefined)
 
-  const handleSearchValueChange = (value) => {
-    setSearchValue(value)
-    if(roomNames.includes(value)){
-      console.log("Room found", value)
-      setResultsCard(
-        <RoomCardAlt
-          key={`${value}-results`}
-          RoomName={value}
-          RoomHouse={"Building"}
-          Avaiability={"Available"}
-        />
-      )
-    } else {
-      console.log("Room not found", value)
-      setResultsCard(undefined)
-    }
-  }
 
   const client = axios.create({
     baseURL: "/api",
@@ -79,24 +56,7 @@ function ListRooms() {
 
   return (
     <>
-    <h1 style={{marginTop: "10vh", textAlign: "center"}}>Search for Rooms</h1>
-    <Autocomplete
-      disablePortal
-      value={searchValue}
-      id="find-a-room-box-demo"
-      options={roomNames}
-      sx={{ width: 300 }}
-      renderInput={(params) => <TextField {...params} label="Find a room" />}
-      style={{margin: "0 auto", display: "block", width: "50%", marginBottom: "2vh"}}
-      onChange={(event, value) => handleSearchValueChange(value)}
-    />
-    <div style={{display: "flex", margin: "auto", justifyContent: "center"}}>
-    {
-      resultsCard
-    }
-    </div>
-
-      <div className='page-header' style={{marginTop: "3vh"}}>
+      <div className='page-header' style={{marginTop: "12vh"}}>
         <h1>Rooms</h1>
       </div>
       
