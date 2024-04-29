@@ -6,6 +6,7 @@ import DataBoard from './pages/dataBoard'
 import ListRooms from './pages/listRooms'
 import Sensors from './pages/sensors'
 import Settings from './pages/settings'
+import About from './pages/about'
 
 function App() {
   return(
@@ -17,6 +18,8 @@ function App() {
           <Route path="settings" element={<Settings />}/>
           <Route path='sensors' element={<Sensors />}/>
           <Route path='databoard' element={<DataBoard />}/>
+          <Route path='about' element={<About />}/>
+          <Route path='*' element={<h1>Not Found</h1>}/>
         </Route>
       </Routes>
     </BrowserRouter>

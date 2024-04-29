@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import CardGrid from '../components/cardGrid/cardGrid'
 import RoomCardAlt from '../components/roomCardAlt/roomCardAlt'
 import axios from 'axios'
-import { Autocomplete, Checkbox, TextField } from '@mui/material'
+import { Checkbox } from '@mui/material'
 
 function ListRooms() {
 
@@ -13,7 +13,7 @@ function ListRooms() {
 
   //Checkbox states
   const [availableCheckBox, setAvailableCheckBox] = useState(true)
-  const [reservedCheckBox, setReservedCheckBox] = useState(true)
+  const [unknownCheckBox, setUnknownCheckBox] = useState(true)
   const [occupiedCheckBox, setOccupiedCheckBox] = useState(true)
 
 
@@ -65,21 +65,22 @@ function ListRooms() {
           <Checkbox checked={availableCheckBox} color="success" onChange={() => setAvailableCheckBox(!availableCheckBox)}/>
           <label>Available</label>
 
-          <Checkbox  checked={reservedCheckBox} color="warning" onChange={() => setReservedCheckBox(!reservedCheckBox)}/>
-          <label>Reserved</label>
-
           <Checkbox checked={occupiedCheckBox}  color="error" onChange={() => setOccupiedCheckBox(!occupiedCheckBox)}/>
           <label>Occupied</label>
+
+          <Checkbox  checked={unknownCheckBox} color="default" onChange={() => setUnknownCheckBox(!unknownCheckBox)}/>
+          <label>Unknown</label>
+
         </div>
-        <p style={{marginLeft: "15px", fontSize: "small"}}>*Reserved means that the room is booked but not in use</p>
+        <p style={{marginLeft: "15px", fontSize: "small"}}>*unknown means that a reliable reading hasn't been made in the room for some time</p>
       </div>
 
       <CardGrid>
         {
           data.map((room, index) => {
             if (room.status === "available" && availableCheckBox 
-                || room.status === "occupied" && occupiedCheckBox 
-                || room.status === "booked" && reservedCheckBox) {
+                || room.status === "reserved" && occupiedCheckBox 
+                || room.status === "unknown" && unknownCheckBox) {
               return (
                 <RoomCardAlt
                   key={room.room}

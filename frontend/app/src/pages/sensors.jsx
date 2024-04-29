@@ -3,6 +3,7 @@ import axios from 'axios'
 import CardGrid from '../components/cardGrid/cardGrid'
 import SensorCard from '../components/sensorCard/sensorCard'
 import HorizontalLegend from '../components/legends/horizontalLegend/horizontalLegend'
+import useAuth from '../hooks/useAuth'
 import './styles/sensors.css'
 
 function Sensors() {
@@ -10,8 +11,8 @@ function Sensors() {
 
   const API_KEY = import.meta.env.API_KEY
 
-  const [authenticated, setAuthenticated] = useState(localStorage.getItem("authed") === 'true' ? true : false)
-  const authCode = 'super_secret_key'
+  const { authenticated, setAuthenticated, authKey } = useAuth()
+  const authCode = authKey
 
   const [sensorAlreadyRegistered, setSensorAlreadyRegistered] = useState(false)
   const [sensorName, setSensorName] = useState("")
@@ -24,7 +25,7 @@ function Sensors() {
   const client = axios.create({
     baseURL: "/api",
     headers: {
-      'X-API-KEY': 'super_secret_key'
+      'X-API-KEY': authKey
     }
   })
 
@@ -76,8 +77,8 @@ function Sensors() {
       <div className='page-header'> 
       <h2>Not Authenticated</h2> 
       <input type='password' placeholder='Enter password' onChange={(e) => {
-        if(e.target.value === authCode){
-          localStorage.setItem("auth", authCode);
+        if(e.target.value === authKey){
+          localStorage.setItem("auth", authKey);
           localStorage.setItem("authTime", Date.now());
           localStorage.setItem("authed", true)
           setAuthenticated(true)

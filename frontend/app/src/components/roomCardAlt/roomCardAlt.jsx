@@ -12,14 +12,14 @@ import "./roomCard.css";
 export default function RoomCardAlt(props) {
 
   let green = "#8ED264";
-  let yellow = "#F4EC32";
+  let gray = "#808080";
   let red = "#E5414B";
   const [roomStatus, setRoomStatus] = useState(props.Avaiability);
   const [roomStatusColor, setRoomStatusColor] = useState(
     props.Avaiability === "available"
       ? green
-      : props.Avaiability === "booked"
-      ? yellow
+      : props.Avaiability === "unknown"
+      ? gray
       : red
   );
 
@@ -27,8 +27,8 @@ export default function RoomCardAlt(props) {
     setRoomStatusColor(
       roomStatus === "available"
         ? green
-        : roomStatus === "booked"
-        ? yellow
+        : roomStatus === "unknown"
+        ? gray
         : red
     );
   }, [roomStatus])
