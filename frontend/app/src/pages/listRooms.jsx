@@ -79,24 +79,7 @@ function ListRooms() {
 
   return (
     <>
-    <h1 style={{marginTop: "10vh", textAlign: "center"}}>Search for Rooms</h1>
-    <Autocomplete
-      disablePortal
-      value={searchValue}
-      id="find-a-room-box-demo"
-      options={roomNames}
-      sx={{ width: 300 }}
-      renderInput={(params) => <TextField {...params} label="Find a room" />}
-      style={{margin: "0 auto", display: "block", width: "50%", marginBottom: "2vh"}}
-      onChange={(event, value) => handleSearchValueChange(value)}
-    />
-    <div style={{display: "flex", margin: "auto", justifyContent: "center"}}>
-    {
-      resultsCard
-    }
-    </div>
-
-      <div className='page-header' style={{marginTop: "3vh"}}>
+      <div className='page-header' style={{marginTop: "12vh"}}>
         <h1>Rooms</h1>
       </div>
       
