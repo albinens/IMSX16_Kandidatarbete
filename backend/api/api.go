@@ -44,6 +44,7 @@ func Init() {
 	mux.Handle("POST /api/auth/key/create", auth.TokenAuthMiddlewareFunc(createKey))
 	mux.Handle("POST /api/auth/gateway/create", auth.TokenAuthMiddlewareFunc(createGatewayLogin))
 	mux.Handle("POST /api/auth/gateway/remove", auth.TokenAuthMiddlewareFunc(removeGatewayLogin))
+	mux.HandleFunc("POST /api/auth/check", checkAuth)
 
 	mux.Handle("DELETE /api/remove-room/{name}", auth.TokenAuthMiddlewareFunc(deleteRoom))
 	mux.Handle("DELETE /api/auth/key/revoke", auth.TokenAuthMiddlewareFunc(deleteApiKey))
