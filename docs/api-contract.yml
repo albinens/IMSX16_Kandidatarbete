@@ -429,6 +429,33 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
 
+  /auth/check:
+    post:
+      summary: 'Checks if the API key is valid.'
+      tags:
+        - 'Auth'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+              example: '123456'
+      responses:
+        '200':
+          description: 'Whether the API key is valid or not.'
+          content:
+            application/json:
+              schema:
+                type: boolean
+                example: true
+        '500':
+          description: 'Internal Server Error.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
   /auth/gateway/create:
     post:
       summary: 'Creates a user and password that a gateway can use to authenticate.'
