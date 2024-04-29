@@ -1,5 +1,5 @@
 import React from "react";
-import './weekChart.css'
+import './legend.css'
 import Checkbox from "@mui/material/Checkbox";
 
 const Legend = ({ data, selectedItems, onChange }) => {
