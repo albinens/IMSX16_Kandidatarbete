@@ -123,7 +123,6 @@ func TokenAuthMiddlewareFunc(handler func(w http.ResponseWriter, r *http.Request
 func TokenAuthMiddlewareHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := r.Header.Get("X-API-KEY")
-		println("Token: ", token)
 		if !isValidToken(r.Context(), token) {
 			utils.WriteHttpError(w, "You are not authorized to perform this action.", http.StatusUnauthorized)
 			return

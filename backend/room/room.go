@@ -271,6 +271,11 @@ func toWeekdayAverage(data map[string]map[string]*roomOccupancyWithEntries) *Wee
 	for room, days := range data {
 		total[room] = make(map[string]float32)
 		for day, entry := range days {
+			if entry.Entries == 0 {
+				total[room][day] = 0
+				continue
+			}
+
 			average := float64(entry.Occupancy) / float64(entry.Entries)
 			twoDecimals := float32(math.Round(average*100)) / 100
 			total[room][day] = twoDecimals
