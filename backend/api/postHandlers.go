@@ -171,3 +171,25 @@ func addRoom(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 }
+
+func checkAuth(w http.ResponseWriter, r *http.Request) {
+	var token string
+	json.NewDecoder(r.Body).Decode(&token)
+
+	keys, err := auth.ApiKeys()
+	if err != nil {
+		utils.WriteHttpError(w, "Internal server error", http.StatusInternalServerError)
+		slog.ErrorContext(r.Context(), "Failed to get api keys", "error", err)
+		return
+	}
+
+	isValid := false
+	for _, key := range keys {
+		if key == token {
+			isValid = true
+			break
+		}
+	}
+
+	json.NewEncoder(w).Encode(isValid)
+}
