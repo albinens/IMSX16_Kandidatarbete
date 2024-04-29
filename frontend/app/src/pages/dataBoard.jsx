@@ -6,14 +6,15 @@ import ChartContainer from '../components/dataCharts/chartContainer/chartContain
 import AverageOccupancyRate from '../components/dataCharts/kpiBox/averageOccupancyRate';
 import PeakOccupancyTime from '../components/dataCharts/kpiBox/peakOccupancyTime';
 import AverageOccupancyDuration from '../components/dataCharts/kpiBox/averageOccupancyDuration';
+import useAuth from '../hooks/useAuth';
 
 const DataBoard = () => {
 
   const [isLoading, setIsLoading] = React.useState(true)
   const [datasetTable, setDatasetTable] = React.useState(undefined)
 
-  const [authenticated, setAuthenticated] = React.useState(localStorage.getItem("authed") === 'true' ? true : false)
-  const authCode = 'super_secret_key'
+  const { authenticated, setAuthenticated, authKey } = useAuth()
+  const authCode = authKey
 
   const unixTimeNow = Math.floor(Date.now() / 1000)
   const unixTimeWeekAgo = unixTimeNow - 604800
@@ -21,7 +22,7 @@ const DataBoard = () => {
   const client = axios.create({
     baseURL: "/api",
     headers: {
-      'X-API-KEY': '7xD9MFMRT8WstAYhrP88pEGd9kpRHq69'
+      'X-API-KEY': authKey
     }
   })
 
