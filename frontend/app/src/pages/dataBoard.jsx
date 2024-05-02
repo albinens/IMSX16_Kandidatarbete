@@ -13,8 +13,7 @@ const DataBoard = () => {
   const [isLoading, setIsLoading] = React.useState(true)
   const [datasetTable, setDatasetTable] = React.useState(undefined)
 
-  const { authenticated, setAuthenticated, authKey } = useAuth()
-  const authCode = authKey
+  const { authenticated, authKey, handleAuthKeySet } = useAuth()
 
   const unixTimeNow = Math.floor(Date.now() / 1000)
   const unixTimeWeekAgo = unixTimeNow - 604800
@@ -42,7 +41,6 @@ const DataBoard = () => {
     if(authenticated){
       fetchDataGraph()
     }
-    console.log('Data loaded dataBoard.jsx', datasetGraph)
   },[isLoading, authenticated])
 
   //Graph 2 data load (right column)
@@ -61,7 +59,6 @@ const DataBoard = () => {
     if(authenticated){
       fetchDataGraph2()
     }
-    console.log('Data loaded dataBoard.jsx', datasetGraph2)
   },[isLoading, authenticated])
 
   //Table data load (left column)
@@ -94,12 +91,7 @@ const DataBoard = () => {
         <div className='page-header'> 
           <h2>Not Authenticated</h2> 
           <input type='password' placeholder='Enter password' onChange={(e) => {
-            if(e.target.value === authCode){
-              localStorage.setItem("auth", authCode);
-              localStorage.setItem("authTime", Date.now());
-              localStorage.setItem("authed", true)
-              setAuthenticated(true)
-            }
+            handleAuthKeySet(e.target.value)
           }} 
           />
         </div> : 
