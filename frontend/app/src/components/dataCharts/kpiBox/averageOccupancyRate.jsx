@@ -23,7 +23,9 @@ const AverageOccupancyRate = (props) => {
     tempData.map((room) => {
       room.data.map((row) => {
         totalOccupancy += row.occupancy
-        totalRecordings++
+        if(row.occupancy !== 0){
+          totalRecordings++
+        }
       })
     })
 
