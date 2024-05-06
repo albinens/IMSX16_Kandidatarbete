@@ -1,7 +1,6 @@
 package room
 
 import (
-	"context"
 	"fmt"
 	"math"
 	"time"
@@ -193,7 +192,6 @@ func RawDataBetween(from, to time.Time, resolution string) (RawRoomData, error) 
 		return make(RawRoomData), errors.New("invalid resolution")
 	}
 
-	reader := database.TimeSeriesReader()
 	query := fmt.Sprintf(`
 		from(bucket: "liveinfo")
 		|> range(start: %d, stop: %d)
@@ -202,7 +200,7 @@ func RawDataBetween(from, to time.Time, resolution string) (RawRoomData, error) 
 		|> aggregateWindow(every: %s, fn: mean, createEmpty: false)
 	`, from.Unix(), to.Unix(), resolution)
 
-	result, err := reader.Query(context.Background(), query)
+	result, err := database.TSQuery(query)
 	if err != nil {
 		return make(RawRoomData), errors.Wrap(err, "failed to query influxdb for room occupancy per day of week")
 	}
@@ -238,7 +236,6 @@ func dataBetween(from, to time.Time) (*api.QueryTableResult, error) {
 		return nil, errors.New("from date must be before to date")
 	}
 
-	reader := database.TimeSeriesReader()
 	query := fmt.Sprintf(`
 		from(bucket: "liveinfo")
 		|> range(start: %d, stop: %d)
@@ -247,7 +244,7 @@ func dataBetween(from, to time.Time) (*api.QueryTableResult, error) {
 		|> group(columns: ["room", "_time"])
 	`, from.Unix(), to.Unix())
 
-	result, err := reader.Query(context.Background(), query)
+	result, err := database.TSQuery(query)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to query influxdb for room occupancy per day of week")
 	}
@@ -291,7 +288,6 @@ type Occupancy struct {
 }
 
 func currentRoomOccupancy() (map[string]Occupancy, error) {
-	reader := database.TimeSeriesReader()
 	query := `
 		from(bucket: "liveinfo")
 		|> range(start: -31d)
@@ -299,7 +295,7 @@ func currentRoomOccupancy() (map[string]Occupancy, error) {
 		|> filter(fn: (r) => r._field == "number_of_people")
 		|> last()
 	`
-	result, err := reader.Query(context.Background(), query)
+	result, err := database.TSQuery(query)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to query influxdb for current room occupancy")
 	}

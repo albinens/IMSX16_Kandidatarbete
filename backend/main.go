@@ -15,7 +15,6 @@ func main() {
 	if err := database.InitSQL(); err != nil {
 		utils.LogFatal("Failed to initialize SQL: ", err)
 	}
-	database.InitTimeSeries()
 	if err := seeder.SeedDevelopmentData(); err != nil {
 		utils.LogFatal("Failed to seed development data: ", err)
 	}

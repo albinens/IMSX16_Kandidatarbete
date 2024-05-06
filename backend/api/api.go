@@ -53,10 +53,11 @@ func Init() {
 	wrappedMux := logger.NewRequestLoggerMiddleware(mux)
 
 	srv := &http.Server{
-		Addr:         ":" + env.Port,
-		Handler:      wrappedMux,
-		WriteTimeout: 30 * time.Second,
-		ReadTimeout:  30 * time.Second,
+		Addr:              ":" + env.Port,
+		Handler:           wrappedMux,
+		WriteTimeout:      10 * time.Second,
+		ReadTimeout:       10 * time.Second,
+		ReadHeaderTimeout: 10 * time.Second,
 	}
 
 	slog.Info("Starting server", "port", env.Port)

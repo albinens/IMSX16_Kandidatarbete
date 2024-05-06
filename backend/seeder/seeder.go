@@ -43,6 +43,7 @@ func populateSQL() error {
 	if err != nil {
 		return err
 	}
+	defer tx.Rollback()
 
 	if err := addRooms(tx); err != nil {
 		return err

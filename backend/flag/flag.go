@@ -34,6 +34,7 @@ func Get(name string) (Flag, error) {
 	if err != nil {
 		return Flag{}, err
 	}
+	defer res.Close()
 
 	var value string
 	for res.Next() {

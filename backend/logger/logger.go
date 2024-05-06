@@ -22,7 +22,9 @@ type RequestLogger struct {
 func Configure() {
 	var handler slog.Handler
 	if !utils.IsProduction() {
-		handler = slog.NewTextHandler(os.Stdout, nil)
+		handler = slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+			Level: slog.LevelDebug,
+		})
 	} else {
 		handler = slog.NewJSONHandler(os.Stdout, nil)
 	}

@@ -15,7 +15,6 @@ func CreateGatewayUser(ctx context.Context, username, password string) error {
 		slog.ErrorContext(ctx, "Error while creating gateway user: ", err)
 		return err
 	}
-
 	return nil
 }
 
@@ -76,6 +75,7 @@ func ApiKeys() (keys []string, err error) {
 		slog.Error("Error while getting API keys: ", err)
 		return nil, err
 	}
+	rows.Close()
 
 	for rows.Next() {
 		var key string
@@ -97,6 +97,7 @@ func verifyGatewayUser(ctx context.Context, username, password string) bool {
 		slog.ErrorContext(ctx, "Error while verifying gateway user: ", err)
 		return false
 	}
+	defer rows.Close()
 
 	if !rows.Next() {
 		return false
@@ -138,10 +139,11 @@ func isValidToken(ctx context.Context, token string) bool {
 		slog.ErrorContext(ctx, "Error while validating token: ", err)
 		return false
 	}
+	defer tokenRows.Close()
 
 	// If the token is not found, it is invalid
 	if !tokenRows.Next() {
-		println("Token not found: ", token, " ", tokenRows.Err())
+		slog.WarnContext(ctx, "Invalid token", "token", token)
 		return false
 	}
 
