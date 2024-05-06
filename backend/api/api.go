@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
+	"time"
 
 	"example.com/m/v2/auth"
 	"example.com/m/v2/env"
@@ -51,8 +52,15 @@ func Init() {
 
 	wrappedMux := logger.NewRequestLoggerMiddleware(mux)
 
+	srv := &http.Server{
+		Addr:         ":" + env.Port,
+		Handler:      wrappedMux,
+		WriteTimeout: 30 * time.Second,
+		ReadTimeout:  30 * time.Second,
+	}
+
 	slog.Info("Starting server", "port", env.Port)
-	utils.LogFatal("Server crashed with error: ", http.ListenAndServe(":"+env.Port, wrappedMux))
+	utils.LogFatal("Server crashed with error: ", srv.ListenAndServe())
 }
 
 func sendJSONResponse(w http.ResponseWriter, r *http.Request, data any) {
